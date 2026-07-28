@@ -134,7 +134,7 @@ Named here rather than left for a reviewer to find:
 ## Status
 
 - [x] Phase 1 — scaffold, config, requirements
-- [ ] Phase 2 — activation capture
+- [x] Phase 2 — activation capture
 - [ ] Phase 3 — SAE + training
 - [ ] Phase 4 — max-activating examples + auto-labelling
 - [ ] Phase 5 — cross-seed reproducibility (core experiment)
