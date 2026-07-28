@@ -1,0 +1,23 @@
+# torch is NOT listed here -- it must be installed separately per platform,
+# because the CUDA build and the Apple Silicon build come from different
+# indexes and pinning one breaks the other machine. See README "Install".
+# Verified against torch 2.13.0.
+#
+# Everything below is platform-independent.
+
+transformer-lens==3.5.1    # hook-point access to GPT-2 small; used only to
+                           # *read* activations, never to build the SAE.
+                           # 3.x is required: TL 2.x calls the removed
+                           # transformers.TRANSFORMERS_CACHE and dies on import
+                           # against transformers 5.x.
+transformers==5.14.1       # pinned explicitly rather than left to TL's
+                           # resolver -- this is the pair that was actually
+                           # verified to load gpt2-small and expose
+                           # blocks.8.hook_resid_pre.
+datasets==3.2.0            # streaming access to NeelNanda/pile-10k
+numpy==2.1.3               # fp16 activation shards (.npy)
+tqdm==4.67.1               # progress on the multi-hour capture/train loops
+matplotlib==3.9.3          # reproducibility histogram, correlation plot
+scipy==1.14.1              # Spearman correlation for Phase 7
+einops==0.8.0              # transformer-lens dependency; pinned explicitly so
+                           # a resolver bump can't change tensor semantics

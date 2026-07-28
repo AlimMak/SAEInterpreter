@@ -1,0 +1,20 @@
+# Activation caches and checkpoints are multi-GB and machine-specific.
+# They are regenerated per machine from a fixed config + fixed dataset, so
+# committing them would bloat the repo without improving reproducibility.
+data/
+checkpoints/
+
+# results/ is deliberately NOT ignored -- the JSON summaries and plots are the
+# actual deliverable of this project and are small.
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
