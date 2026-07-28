@@ -157,3 +157,129 @@ header.
 smoke sequences come from only ~270 documents. Fine for a pipeline test,
 meaningless for feature diversity — another reason nothing from smoke goes in
 the writeup. The `full` preset draws ~5,400 documents.
+
+---
+
+## Phase 3 — SAE, sampler, training loop
+
+**What I built.** `sae.py` (the autoencoder, decoder renormalisation, gradient
+projection), `data_store.py` (read-time shuffle buffer), `train.py`,
+`evaluate.py` + `eval_checkpoint.py` (loss recovered), `test_sampler.py`,
+`plot_ablation.py`.
+
+**Why this design choice — the gradient projection.** Projected after
+`backward()` and before `optimizer.step()`, not applied to the update
+afterwards. The parallel component of the decoder gradient is deleted by
+renormalisation every step, so it produces no movement — it is known to be
+useless before it is computed. But Adam does not only use the gradient for
+direction: it accumulates it into the second-moment estimate `v`. A parallel
+component that moves nothing still inflates `v` and therefore shrinks the
+effective learning rate `grad/sqrt(v)` on the perpendicular component that does
+the work. Projecting the update post-Adam fixes the step direction but leaves
+`v` polluted, and that pollution persists through the moving average for many
+steps. It does *not* make the update tangential — Adam rescales element-wise,
+which is not a rotation — so renormalisation after every step is still
+required. The projection reduces waste; it does not replace normalisation.
+
+**Why this design choice — two shuffles doing different jobs.** A fixed
+write-time permutation (`WRITE_SHUFFLE_SEED = 1234`, hardcoded, identical for
+all ten runs) decorrelates disk order from corpus order. A `data_seed`-driven
+read-time shuffle buffer then decides batch composition. Neither alone works:
+write-time only would freeze batch order identically for every run and collapse
+Arm B into Arm A; read-time only over a full random permutation is what caused
+the I/O problem below.
+
+**Evidence the experiment survived the sampler change** (the number to quote):
+
+| | Arm B batch overlap | chance | ratio |
+|---|---|---|---|
+| smoke (buffer = 41% of cache) | 43.2 / 4096 | 26.4 | 1.63× |
+| full (buffer = 2.1% of cache) | 0.0 / 4096 | 1.3 | 0.00× |
+
+Smoke sits above chance only because the buffer covers 41% of a small cache, so
+two streams' buffers overlap heavily. At full scale the buffer is 2% of the
+cache and overlap falls to zero. Arm A stays byte-identical across different
+init seeds even when torch's and numpy's global RNGs are deliberately disturbed
+first.
+
+**Why this design choice — loss recovered.** Explained variance measures the
+quantity the loss optimises, so it is nearly guaranteed to look good, and it is
+not the question anyone cares about. Variance is dominated by the largest
+directions; importance to the network is not. Loss recovered splices the
+reconstruction into the residual stream and measures CE damage normalised
+against zero-ablation: `(CE_zero - CE_sae) / (CE_zero - CE_clean)`. Normalising
+matters because raw CE degradation is uninterpretable — +0.3 nats means nothing
+without knowing what total destruction costs. First reading, at step 0 of an
+untrained SAE: CE_clean 3.59, CE_sae 5.30, CE_zero 12.05 → 0.798 recovered.
+A randomly-initialised autoencoder already "recovers 80% of the loss," which is
+the clearest possible argument for why this metric needs its floor stated.
+
+**What went wrong, in order.**
+
+1. *`l1_coeff = 5e-4` was ~3 orders of magnitude too weak.* At step 600 of the
+   first run the sparsity term was **0.36% of the loss** and L0 was 3,544
+   against a target of 30. Cause: 5e-4 is the standard value for activations
+   normalised so `E‖x‖ = √d_model ≈ 27.7`; raw layer-8 activations have
+   `‖x‖ ≈ 101.8`. MSE scales with `‖x‖²`, L1 with `‖x‖`. Fixed by storing one
+   global scalar (`norm_scale = 0.272329`) in the manifest at capture time, read
+   by every run and never recomputed per run. A uniform scalar is a dilation: it
+   cannot rotate anything, so decoder directions and every cross-seed cosine
+   similarity — the quantities this project measures — are untouched. Asserted
+   in the test: min cosine between raw and scaled rows is 0.99999976.
+
+2. *My first l1 sweep was worthless, and the lesson is the useful part.* L0
+   moved 2082 → 2101 across an 80× change in `l1_coeff` and I briefly read that
+   as a flat sparsity response. It was not. 400 steps at batch 2048 is far too
+   early: L0 starts near `d_sae/2` (half the features fire at init, measured
+   6,141 of 12,288) and takes thousands of steps to come down. **Any sparsity
+   measurement taken before L0 plateaus is measuring initialisation dynamics,
+   not the l1 response.** Sweep only after locating the plateau, and locate it
+   with one long run rather than several short ones.
+
+3. *Killed the first real run at step 600 of 3000 to diagnose, which threw away
+   the converged number I needed.* L0 was still falling monotonically when I
+   stopped it. Diagnosing early was right; stopping the only run producing the
+   answer was not.
+
+4. *A full random permutation over the memmap was I/O-suicide.* 4096 scattered
+   reads per batch, each row 1536 bytes — smaller than a page — so a batch
+   touched ~4096 pages: 400ms cold versus 6ms warm. Projected 3.3h of pure I/O
+   per run on the 18GB preset, ~33h across ten runs with the GPU idle. This is
+   what motivated the two-shuffle scheme.
+
+5. *The overlap test was measuring the corpus, not the sampler.* It compared
+   batches by hashing row bytes, and **0.81% of rows in the cache are exact
+   byte-duplicates** of another row — repeated boilerplate in pile-10k produces
+   identical activations. That adds ~33 false matches per 4096-row batch and
+   made an at-chance overlap read as 2× chance. Fixed by threading true global
+   indices through the buffer. The sampler was fine; the ruler was wrong. Same
+   shape of error as the BOS bug: a plausible number with no error raised.
+
+6. *Then a memory failure that stopped training without failing.* The buffer
+   held float32 and the shuffle was `buf = buf[p]`, which allocates a second
+   full buffer for the copy — ~1.5GB peak on a machine with 8.6GB total. With
+   GPT-2 also resident for the in-loop eval, the process went to **0.1% CPU and
+   14MB resident** with 9.9GB in swap. It was not crashed, not erroring, just
+   swapped out and making no progress. Fixed three ways: buffer kept in the
+   cache's native fp16 (384MB not 768MB), the shuffle permutes an index array
+   instead of the data so the buffer is allocated once and mutated in place, and
+   loss recovered moved to a separate process (`eval_checkpoint.py`) so GPT-2 is
+   never resident during training.
+
+**Machine constraint worth stating plainly.** This laptop has 8.6GB of unified
+memory, shared between CPU and GPU, and runs with ~59MB of free pages. Measured
+step time is linear in batch size (4096→1.18s, 2048→0.59s, 1024→0.33s,
+512→0.20s) and at batch 512 works out to ~185 GFLOPS, an order of magnitude
+under what the GPU should manage — so smoke is memory-bound, not compute-bound,
+and the fix is the RTX box rather than more tuning here. Reinforces the original
+decision that smoke is a pipeline test and nothing more.
+
+**What I'd say if asked about it in an interview.** "The two failures worth
+talking about are both the same failure. The BOS bug and the batch-overlap bug
+both produced correct-looking numbers with no error raised, and in both cases
+what caught them was checking the measurement against something independent —
+decoding tokens back to text, and switching from content-hashing to true
+indices. The l1 mistake is the other kind: I measured a real quantity at the
+wrong time. L0 starts at half of d_sae because half the features fire at
+initialisation, and it takes thousands of steps to come down, so a 400-step
+sweep tells you about initialisation and nothing about your sparsity penalty."

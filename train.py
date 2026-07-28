@@ -18,12 +18,18 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from config import Config, get_config, get_device, set_seed
-from data_store import ActivationStore, batch_index_stream
+from config import SHUFFLE_BUFFER_ROWS, Config, get_config, get_device, set_seed
+from data_store import ActivationStore, batch_stream
 from sae import SparseAutoencoder, compute_metrics
 
 
-def train(cfg: Config, run_name: str, project_grad: bool) -> Path:
+def train(
+    cfg: Config,
+    run_name: str,
+    project_grad: bool = True,
+    eval_every: int = 0,
+    quiet: bool = False,
+) -> Path:
     device = get_device()
     run_dir = cfg.run_dir(run_name)
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -31,29 +37,31 @@ def train(cfg: Config, run_name: str, project_grad: bool) -> Path:
     store = ActivationStore(cfg.act_dir)
     data_seed = cfg.seed if cfg.data_seed is None else cfg.data_seed
 
-    print(f"run={run_name}  device={device}")
-    print(f"seed={cfg.seed}  data_seed={data_seed}"
-          f"{'  (follows seed)' if cfg.data_seed is None else '  (pinned)'}")
-    print(f"rows={store.total_rows:,}  d_sae={cfg.d_sae}  "
-          f"steps={cfg.n_steps:,}  epochs={cfg.batch_size * cfg.n_steps / store.total_rows:.1f}")
-    print(f"decoder grad projection: {'ON' if project_grad else 'OFF (ablation)'}")
+    if not quiet:
+        print(f"run={run_name}  device={device}")
+        print(f"seed={cfg.seed}  data_seed={data_seed}"
+              f"{'  (follows seed)' if cfg.data_seed is None else '  (pinned)'}")
+        print(f"rows={store.total_rows:,}  d_sae={cfg.d_sae}  steps={cfg.n_steps:,}  "
+              f"epochs={cfg.batch_size * cfg.n_steps / store.total_rows:.1f}")
+        print(f"l1_coeff={cfg.l1_coeff:g}  norm_scale={store.norm_scale:.6f} (from manifest)")
+        print(f"decoder grad projection: {'ON' if project_grad else 'OFF (ablation)'}")
 
     # set_seed is called with `seed`, not data_seed: it governs weight init and
     # any other torch-side randomness. Batch order is driven separately by the
-    # numpy Generator inside batch_index_stream, which is the entire point --
-    # the two sources of randomness must not share a stream or Arm A cannot
-    # hold one fixed while varying the other.
+    # numpy Generator inside batch_stream, which is the entire point -- the two
+    # sources of randomness must not share a stream or Arm A cannot hold one
+    # fixed while varying the other.
     set_seed(cfg.seed)
 
     sae = SparseAutoencoder(cfg.d_model, cfg.d_sae).to(device)
 
-    # Seed b_dec from a sample of real activations rather than zeros.
+    # b_dec from a sample of real (normalised) activations rather than zeros.
     sample_idx = np.sort(
         np.random.default_rng(data_seed).choice(
             store.total_rows, size=min(65_536, store.total_rows), replace=False
         )
     )
-    sample = torch.from_numpy(store.gather(sample_idx)).to(device)
+    sample = torch.from_numpy(store.gather(sample_idx) * store.norm_scale).to(device)
     sae.init_b_dec_from_data(sample)
     del sample
 
@@ -65,16 +73,25 @@ def train(cfg: Config, run_name: str, project_grad: bool) -> Path:
     # v1 would confound the thing this project measures.
     steps_since_fired = torch.zeros(cfg.d_sae, dtype=torch.long, device=device)
 
-    log_path = run_dir / "metrics.jsonl"
-    log_f = log_path.open("w")
+    eval_model = eval_tokens = None
+    if eval_every:
+        from transformer_lens import HookedTransformer
+        from evaluate import build_eval_batch
+
+        eval_model = HookedTransformer.from_pretrained(cfg.model_name, device=str(device))
+        eval_model.eval()
+        eval_tokens = build_eval_batch(cfg, eval_model)
+
+    log_f = (run_dir / "metrics.jsonl").open("w")
     t_start = time.time()
     throughput: list[float] = []
 
-    for step, idx in enumerate(
-        batch_index_stream(store.total_rows, cfg.batch_size, cfg.n_steps, data_seed)
-    ):
+    stream = batch_stream(
+        store, cfg.batch_size, cfg.n_steps, data_seed, SHUFFLE_BUFFER_ROWS, normalize=True
+    )
+    for step, batch_np in enumerate(stream):
         t0 = time.time()
-        x = torch.from_numpy(store.gather(idx)).to(device)
+        x = torch.from_numpy(batch_np).to(device)
 
         xhat, f = sae(x)
         mse = ((xhat - x) ** 2).sum(-1).mean()
@@ -94,15 +111,15 @@ def train(cfg: Config, run_name: str, project_grad: bool) -> Path:
         sae.normalize_decoder()  # still required -- Adam's step is not tangential
 
         with torch.no_grad():
-            fired = (f > 0).any(dim=0)
             steps_since_fired += 1
-            steps_since_fired[fired] = 0
+            steps_since_fired[(f > 0).any(dim=0)] = 0
 
         if step < 100:
             throughput.append(cfg.batch_size / (time.time() - t0))
-        if step == 99:
-            print(f"throughput (first 100 steps): {np.mean(throughput):,.0f} samples/s "
-                  f"-> ~{cfg.n_steps * cfg.batch_size / np.mean(throughput) / 60:.1f} min projected")
+        if step == 99 and not quiet:
+            sps = float(np.mean(throughput))
+            print(f"throughput (first 100 steps): {sps:,.0f} samples/s "
+                  f"-> ~{cfg.n_steps * cfg.batch_size / sps / 60:.1f} min projected")
 
         if step % cfg.log_every == 0 or step == cfg.n_steps - 1:
             with torch.no_grad():
@@ -114,10 +131,17 @@ def train(cfg: Config, run_name: str, project_grad: bool) -> Path:
                 dead=int((steps_since_fired > cfg.dead_feature_window).sum()),
                 elapsed=round(time.time() - t_start, 1),
             )
+            if eval_every and (step % eval_every == 0 or step == cfg.n_steps - 1):
+                from evaluate import loss_recovered
+
+                m.update(loss_recovered(sae, eval_model, eval_tokens,
+                                        cfg.hook_name, store.norm_scale))
             log_f.write(json.dumps(m) + "\n")
             log_f.flush()
-            print(f"step {step:>6}  mse {m['mse']:>9.2f}  L0 {m['l0']:>8.1f}  "
-                  f"EV {m['explained_variance']:>6.3f}  dead {m['dead']:>5}")
+            if not quiet:
+                lr_s = f"  LR {m['loss_recovered']:.3f}" if "loss_recovered" in m else ""
+                print(f"step {step:>6}  mse {m['mse']:>8.3f}  L0 {m['l0']:>8.1f}  "
+                      f"EV {m['explained_variance']:>6.3f}  dead {m['dead']:>5}{lr_s}")
 
         if cfg.ckpt_every and step > 0 and step % cfg.ckpt_every == 0:
             torch.save(sae.state_dict(), run_dir / f"sae_step{step}.pt")
@@ -133,13 +157,15 @@ def train(cfg: Config, run_name: str, project_grad: bool) -> Path:
         run_name=run_name,
         resolved_data_seed=data_seed,
         decoder_grad_projection=project_grad,
+        shuffle_buffer_rows=SHUFFLE_BUFFER_ROWS,
         total_rows=store.total_rows,
         cache_manifest=store.manifest,
         wall_clock_s=round(time.time() - t_start, 1),
     )
     (run_dir / "run_config.json").write_text(json.dumps(meta, indent=2))
 
-    print(f"\nsaved -> {run_dir}  ({time.time() - t_start:.0f}s)")
+    if not quiet:
+        print(f"\nsaved -> {run_dir}  ({time.time() - t_start:.0f}s)")
     return run_dir
 
 
@@ -154,18 +180,32 @@ def main() -> None:
         help="batch order; omit to follow --seed (Arm B), pin to a constant for Arm A",
     )
     p.add_argument("--run_name", default=None)
+    p.add_argument("--l1_coeff", type=float, default=None, help="override config l1_coeff")
+    p.add_argument("--n_steps", type=int, default=None, help="override config n_steps")
     p.add_argument(
         "--no_decoder_projection",
         action="store_true",
         help="ablation: skip the decoder gradient projection",
     )
+    p.add_argument(
+        "--eval_every",
+        type=int,
+        default=0,
+        help="steps between loss-recovered evals (0 = off; needs a GPT-2 forward pass)",
+    )
     args = p.parse_args()
 
-    cfg = get_config(args.preset, seed=args.seed, data_seed=args.data_seed)
+    overrides = dict(seed=args.seed, data_seed=args.data_seed)
+    if args.l1_coeff is not None:
+        overrides["l1_coeff"] = args.l1_coeff
+    if args.n_steps is not None:
+        overrides["n_steps"] = args.n_steps
+    cfg = get_config(args.preset, **overrides)
+
     run_name = args.run_name or (
         f"seed{args.seed}" + ("" if args.data_seed is None else f"_data{args.data_seed}")
     )
-    train(cfg, run_name, project_grad=not args.no_decoder_projection)
+    train(cfg, run_name, project_grad=not args.no_decoder_projection, eval_every=args.eval_every)
 
 
 if __name__ == "__main__":

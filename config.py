@@ -220,6 +220,26 @@ def get_config(preset: str = "smoke", **overrides) -> Config:
 
 
 # --------------------------------------------------------------------------
+# Write-time shuffle
+# --------------------------------------------------------------------------
+# Hardcoded, never a CLI flag, never derived from `seed`. capture.py applies
+# this one fixed permutation when writing shards, so on-disk order is
+# decorrelated from corpus order -- which is what lets a moderate read-time
+# buffer still sample across the whole corpus with sequential reads.
+#
+# It is a *constant* because every run must read the identical on-disk layout.
+# If this varied per run it would become a second uncontrolled variable, which
+# is precisely what the frozen cache exists to prevent. Batch order still comes
+# from `data_seed` at read time; this permutation only decides where rows live.
+WRITE_SHUFFLE_SEED = 1234
+
+# Rows held in the read-time shuffle buffer. 1M rows x 768 fp32 = 3.1GB, too
+# much for the 8GB laptop; 262144 rows = 768MB and still mixes ~2% of the full
+# corpus per buffer on top of an already-decorrelated disk order.
+SHUFFLE_BUFFER_ROWS = 262_144
+
+
+# --------------------------------------------------------------------------
 # The 10-run experiment matrix
 # --------------------------------------------------------------------------
 N_SEEDS = 5

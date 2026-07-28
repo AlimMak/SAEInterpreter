@@ -1,14 +1,33 @@
 """Read-time access to the frozen activation cache.
 
-This module is where `data_seed` earns its keep. capture.py deliberately wrote
-the shards in corpus order; the permutation that decides batch composition is
-generated here, at read time, from `data_seed` alone. Two consequences the
-experiment depends on:
+Batch composition is decided here, at read time, by an RNG seeded from
+`data_seed` alone. Two consequences the experiment depends on:
 
   * same data_seed  -> identical batch sequence, regardless of `seed`  (Arm A)
   * different seeds -> different batch sequence                        (Arm B)
 
 test_sampler.py asserts both rather than trusting them.
+
+Why a shuffle buffer over sequential reads, rather than a full random
+permutation over the memmap:
+
+A full permutation issues 4096 scattered reads per batch. Each row is 1536
+bytes -- smaller than a page -- so a batch touches ~4096 distinct pages, and
+measured on the 8GB laptop that cost ~400ms per batch against ~6ms once the
+pages were warm. For the 18GB full preset the pages can never all be warm, so
+that cost would be permanent: roughly 3.3 hours of pure I/O per run, 33 hours
+across the ten runs, with the GPU idle for most of it.
+
+The fix is split across the two stages. capture.py already applied one fixed
+permutation at write time, so *disk order is uncorrelated with corpus order*.
+That means a sequential block of rows on disk is already a random sample of the
+corpus, and the read-time buffer only has to break up the residual structure
+within a block and make batch composition depend on data_seed. Sequential
+reads, seed-dependent batches, no page-fault cliff.
+
+The thing this must not become is a write-time shuffle *alone*: that would fix
+batch order identically for every run and silently collapse Arm B into Arm A.
+Both shuffles are required, and they do different jobs.
 """
 
 from __future__ import annotations
@@ -20,13 +39,7 @@ import numpy as np
 
 
 class ActivationStore:
-    """Memory-maps the activation shards and gathers arbitrary rows.
-
-    Memory-mapped rather than loaded: the full preset is 18GB against 8GB of
-    VRAM and a laptop with finite RAM. The OS page cache handles residency,
-    and because we only ever touch one batch's worth of rows at a time, the
-    working set stays small.
-    """
+    """Memory-maps the activation shards and reads rows by global index."""
 
     def __init__(self, act_dir: Path):
         self.act_dir = Path(act_dir)
@@ -46,11 +59,19 @@ class ActivationStore:
         ]
 
         rows = self.manifest["shard_rows"]
-        # offsets[i] is the global index of shard i's first row; used to turn a
-        # global row index into (shard, local index).
         self.offsets = np.concatenate([[0], np.cumsum(rows)])
         self.total_rows = int(self.offsets[-1])
         self.d_model = self.manifest["d_model"]
+
+        # Read once from the manifest, never recomputed. A per-run scalar would
+        # be a fresh source of cross-run variation in an experiment whose whole
+        # subject is cross-run variation.
+        if "norm_scale" not in self.manifest:
+            raise RuntimeError(
+                f"{manifest_path} has no norm_scale -- it predates the normalisation "
+                f"change. Re-run capture.py for this preset."
+            )
+        self.norm_scale = float(self.manifest["norm_scale"])
 
         for i, (a, t) in enumerate(zip(self.acts, self.toks)):
             if a.shape[0] != t.shape[0]:
@@ -58,14 +79,43 @@ class ActivationStore:
                     f"shard {i}: {a.shape[0]} activation rows vs {t.shape[0]} token rows"
                 )
 
-    def gather(self, idx: np.ndarray) -> np.ndarray:
-        """Fetch rows by global index. `idx` is expected pre-sorted."""
-        if len(self.acts) == 1:
-            return np.asarray(self.acts[0][idx], dtype=np.float32)
+    def read_block(self, start: int, n: int) -> tuple[np.ndarray, np.ndarray]:
+        """Read `n` consecutive rows starting at global index `start`.
 
+        Returns (rows_fp16, global_indices). Wraps at the end of the cache.
+        Contiguous within each shard, so this is a sequential read -- the whole
+        point of the write-time permutation.
+
+        The indices are returned because test_sampler.py needs to measure batch
+        overlap between arms by *identity*. Comparing row contents instead is
+        not equivalent: 0.81% of rows in this cache are exact byte-duplicates
+        of another row (repeated boilerplate in the corpus produces identical
+        activations), which adds ~33 false matches to a 4096-row batch and
+        would make an at-chance overlap look like 2x chance.
+
+        Rows come back in the cache's native fp16. Widening to fp32 happens per
+        batch instead, because the buffer is the largest allocation in the
+        process: 262144 x 768 is 384MB as fp16 and 768MB as fp32, and on the
+        8GB development machine the fp32 version drove the system 10.9GB into
+        swap. The values are identical either way -- the cache is fp16 on disk.
+        """
+        out = np.empty((n, self.d_model), dtype=np.float16)
+        idx = np.empty(n, dtype=np.int64)
+        filled = 0
+        pos = start % self.total_rows
+        while filled < n:
+            s = int(np.searchsorted(self.offsets, pos, side="right") - 1)
+            local = pos - self.offsets[s]
+            take = min(n - filled, self.acts[s].shape[0] - local)
+            out[filled : filled + take] = self.acts[s][local : local + take]
+            idx[filled : filled + take] = np.arange(pos, pos + take)
+            filled += take
+            pos = (pos + take) % self.total_rows
+        return out, idx
+
+    def gather(self, idx: np.ndarray) -> np.ndarray:
+        """Fetch arbitrary rows by global index. Used for eval, not training."""
         out = np.empty((idx.shape[0], self.d_model), dtype=np.float32)
-        # Split the sorted index array at shard boundaries; each slice is then
-        # a contiguous, ascending read within one memmap.
         bounds = np.searchsorted(idx, self.offsets)
         for s in range(len(self.acts)):
             lo, hi = bounds[s], bounds[s + 1]
@@ -86,31 +136,61 @@ class ActivationStore:
         return out
 
 
-def batch_index_stream(
-    total_rows: int, batch_size: int, n_steps: int, data_seed: int
-) -> "list[np.ndarray]":
-    """Yield one array of row indices per training step.
+def batch_stream(
+    store: ActivationStore,
+    batch_size: int,
+    n_steps: int,
+    data_seed: int,
+    buffer_rows: int,
+    normalize: bool = True,
+    with_indices: bool = False,
+):
+    """Yield one batch of activations per training step.
 
-    A **full permutation** over every row, reshuffled each time the pool is
-    exhausted -- not a block shuffle over shards or a shuffle within a buffer.
-    Block shuffling would leave rows from the same document adjacent in a
-    batch, so a batch would be a sample of a few documents rather than of the
-    corpus, and the gradient would be correlated in a way that varies with the
-    block layout rather than with the seed.
+    Half-buffer refill: the buffer is drained to 50%, then the consumed rows
+    are overwritten from the next sequential block and the draw order is
+    reshuffled. This keeps every batch a mixture of rows read at different
+    times rather than a single contiguous block, and keeps reads sequential.
 
-    Indices within a batch are **sorted** before being returned. Sorting does
-    not change which rows are in the batch -- the batch composition is fixed by
-    the permutation, which is fixed by data_seed -- it only changes the order
-    they are read from the memmap, turning a scattered random read into an
-    ascending one. The SAE has no notion of within-batch order, so this is free.
+    `data_seed` drives both the shuffle inside the buffer and the starting
+    offset into the cache, so two runs with different data_seeds see different
+    batches from step 0 rather than converging on the same first epoch.
+
+    The buffer is allocated once and mutated in place, and the shuffle is a
+    permutation of an *index* array rather than of the data. Permuting the data
+    (`buf = buf[p]`) allocates a second full buffer for the duration of the
+    copy; at fp32 that peaked around 1.5GB and pushed the 8GB dev machine into
+    swap, which cost more than the page faults this sampler exists to avoid.
     """
     rng = np.random.default_rng(data_seed)
-    perm = rng.permutation(total_rows)
-    pos = 0
+    buffer_rows = min(buffer_rows, store.total_rows)
+    half = buffer_rows // 2
+
+    read_pos = int(rng.integers(0, store.total_rows))
+    buf, bidx = store.read_block(read_pos, buffer_rows)  # fp16, allocated once
+    read_pos += buffer_rows
+    order = rng.permutation(buffer_rows)
+    take = 0
+
+    scale = np.float32(store.norm_scale if normalize else 1.0)
+
     for _ in range(n_steps):
-        if pos + batch_size > total_rows:
-            perm = rng.permutation(total_rows)  # next epoch, same RNG stream
-            pos = 0
-        idx = perm[pos : pos + batch_size]
-        pos += batch_size
-        yield np.sort(idx)
+        if take + batch_size > buffer_rows:
+            # Overwrite exactly the rows already handed out. Their positions
+            # are scattered (order is a permutation), which is fine -- they are
+            # being replaced, and writing into an existing allocation avoids
+            # the temporary copy.
+            n_new = max(half, take)
+            fresh, fidx = store.read_block(read_pos, n_new)
+            read_pos += n_new
+            slots = order[:n_new]
+            buf[slots] = fresh
+            bidx[slots] = fidx
+            order = rng.permutation(buffer_rows)
+            take = 0
+            del fresh, fidx
+
+        sel = order[take : take + batch_size]
+        take += batch_size
+        batch = buf[sel].astype(np.float32) * scale
+        yield (batch, bidx[sel]) if with_indices else batch

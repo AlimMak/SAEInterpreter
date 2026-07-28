@@ -6,20 +6,40 @@ once and frozen on disk; recomputing them per run would introduce a second
 uncontrolled variable (nondeterministic kernel reductions, dataset streaming
 order, tokeniser version) on top of the one we are trying to measure.
 
-Two invariants this file exists to protect:
+Three invariants this file exists to protect:
 
-1. **Corpus order is preserved on disk.** Shards are written in the order the
-   documents arrive. Batch order is imposed later, at *read* time, by sampling
-   indices with an RNG seeded from `data_seed`. If the shuffle were baked into
-   the files, on-disk order would fix batch order for every run and Arm B
-   would silently collapse into Arm A -- the experiment would report a
-   difference of zero and look like a clean result.
+1. **On-disk order is a fixed permutation, shared by every run.** Rows are
+   shuffled at write time under `WRITE_SHUFFLE_SEED`, a hardcoded constant.
+   This decorrelates disk order from corpus order, so a moderate read-time
+   buffer over *sequential* reads still draws a batch from across the whole
+   corpus -- which is what makes training I/O-bound-free without block
+   structure leaking into batch composition.
+
+   Critically this is not the *only* shuffle: batch order is still imposed at
+   read time from `data_seed` (see data_store.py). A write-time shuffle alone
+   would freeze batch order identically for every run and collapse Arm B into
+   Arm A. A write-time shuffle *plus* a read-time buffer gives both sequential
+   I/O and seed-dependent batches.
 
 2. **Row i of the activation cache is row i of the token cache.** Every
    downstream feature label depends on mapping an activation back to the token
    that produced it. A misalignment here is invisible until Phase 4, where it
-   shows up as plausible-looking but wrong labels. So the alignment is asserted
-   per shard and the run dies rather than writing a corrupt cache.
+   shows up as plausible-looking but wrong labels. The permutation is applied
+   to both arrays with the same index array, and alignment is asserted.
+
+3. **The normalisation scalar is computed once and stored.** Every run reads
+   the stored value rather than deriving its own; a per-run scalar would be a
+   new source of cross-run variation in an experiment whose entire subject is
+   cross-run variation.
+
+Two passes:
+  pass 1 -- stream the corpus, run the model, route each row to a random
+            bucket, append to raw .bin files (all sequential writes)
+  pass 2 -- load each bucket, shuffle within it, save as .npy
+
+Random bucket assignment followed by a within-bucket shuffle *is* a uniform
+global permutation, and it never needs more than one bucket in RAM -- which is
+what makes it work for the 18GB full preset.
 """
 
 from __future__ import annotations
@@ -28,7 +48,6 @@ import argparse
 import json
 import shutil
 import sys
-from dataclasses import asdict
 from pathlib import Path
 
 import numpy as np
@@ -37,12 +56,11 @@ from datasets import load_dataset
 from tqdm import tqdm
 from transformer_lens import HookedTransformer
 
-from config import Config, get_config, get_device
+from config import WRITE_SHUFFLE_SEED, Config, get_config, get_device
 
-# ~1GB shards: large enough that the full preset is ~18 files rather than
-# thousands, small enough to memory-map cheaply and to lose little work if a
-# capture is interrupted partway.
-TARGET_SHARD_BYTES = 1024**3
+# ~1GB buckets: large enough that the full preset is ~18 files rather than
+# thousands, small enough that pass 2 can hold one in RAM to shuffle it.
+TARGET_BUCKET_BYTES = 1024**3
 
 
 def layer_from_hook(hook_name: str) -> int:
@@ -71,16 +89,9 @@ def stop_layer_for(hook_name: str) -> int:
 
 
 def model_revision(model_name: str) -> str:
-    """Pin the exact HF commit the weights came from.
-
-    'gpt2-small' is a moving target in principle -- recording the commit sha
-    means the cache can be regenerated identically on the other machine, which
-    is the whole point of freezing the data.
-    """
+    """Pin the exact HF commit the weights came from."""
     try:
         from huggingface_hub import model_info
-
-        # TransformerLens maps its own alias onto the HF repo id.
         from transformer_lens.loading_from_pretrained import get_official_model_name
 
         return model_info(get_official_model_name(model_name)).sha
@@ -91,21 +102,15 @@ def model_revision(model_name: str) -> str:
 def iter_sequences(cfg: Config, tokenizer, bos_id: int):
     """Yield token sequences of exactly `seq_len`, each starting with BOS.
 
-    Documents are tokenised and cut into non-overlapping windows of
-    `seq_len - 1` content tokens, with BOS prepended to each window. Two
-    deliberate choices:
-
-    * **No padding, ever.** A pad token has no meaning in the residual stream,
-      but it still produces an activation, and those activations would become
+    * **No padding, ever.** A pad token has no meaning in the residual stream
+      but still produces an activation, and those activations would become
       training data -- the SAE would learn features for an artifact of our
-      batching. Documents (and trailing remainders) shorter than one full
-      window are dropped instead.
+      batching. Short documents and trailing remainders are dropped instead.
 
-    * **No cross-document packing.** The usual LM trick of concatenating the
-      corpus into one stream and slicing it would put unrelated documents in
-      the same context window, so activations late in a sequence would be
-      conditioned on text from a different document. That is fine for training
-      a language model and bad for interpreting what a feature responds to.
+    * **No cross-document packing.** Concatenating the corpus into one stream
+      would put unrelated documents in the same context window, so activations
+      late in a sequence would be conditioned on text from a different
+      document. Fine for LM training, bad for interpreting a feature.
     """
     content_len = cfg.seq_len - 1  # one slot reserved for BOS
     ds = load_dataset(cfg.dataset_name, split="train", streaming=cfg.streaming)
@@ -122,67 +127,69 @@ def iter_sequences(cfg: Config, tokenizer, bos_id: int):
         ids = tokenizer(doc["text"], add_special_tokens=False)["input_ids"]
         n_windows = len(ids) // content_len  # trailing remainder dropped
         for w in range(n_windows):
-            window = ids[w * content_len : (w + 1) * content_len]
-            yield [bos_id] + window
+            yield [bos_id] + ids[w * content_len : (w + 1) * content_len]
 
 
-class ShardWriter:
-    """Buffers rows and flushes ~1GB activation/token shard pairs to disk."""
+class BucketWriter:
+    """Pass 1: route rows to random buckets, appending to raw .bin files.
 
-    def __init__(self, out_dir: Path, cfg: Config):
+    Appending raw bytes rather than .npy because bucket sizes are not known in
+    advance under random routing. Pass 2 converts to .npy.
+    """
+
+    def __init__(self, out_dir: Path, cfg: Config, n_buckets: int, rng: np.random.Generator):
         self.out_dir = out_dir
         self.cfg = cfg
-        # Keep shards a whole number of sequences so a sequence is never split
-        # across two files -- Phase 4 needs to show a token in its context.
-        rows_per_seq = cfg.tokens_per_seq
-        bytes_per_row = cfg.d_model * 2  # fp16
-        seqs_per_shard = max(1, (TARGET_SHARD_BYTES // bytes_per_row) // rows_per_seq)
-        self.rows_per_shard = seqs_per_shard * rows_per_seq
-
-        self.acts = np.empty((self.rows_per_shard, cfg.d_model), dtype=np.float16)
-        self.toks = np.empty(self.rows_per_shard, dtype=np.int32)
-        self.fill = 0
-        self.shard_idx = 0
-        self.shard_rows: list[int] = []
+        self.n_buckets = n_buckets
+        self.rng = rng
+        self.act_f = [(out_dir / f"_raw_acts_{i:05d}.bin").open("wb") for i in range(n_buckets)]
+        self.tok_f = [(out_dir / f"_raw_toks_{i:05d}.bin").open("wb") for i in range(n_buckets)]
+        self.counts = np.zeros(n_buckets, dtype=np.int64)
 
     def add(self, acts: np.ndarray, toks: np.ndarray) -> None:
-        assert acts.shape[0] == toks.shape[0], (
-            f"row-count mismatch before buffering: {acts.shape[0]} acts vs {toks.shape[0]} toks"
-        )
-        pos = 0
-        n = acts.shape[0]
-        while pos < n:
-            take = min(self.rows_per_shard - self.fill, n - pos)
-            self.acts[self.fill : self.fill + take] = acts[pos : pos + take]
-            self.toks[self.fill : self.fill + take] = toks[pos : pos + take]
-            self.fill += take
-            pos += take
-            if self.fill == self.rows_per_shard:
-                self.flush()
+        assert acts.shape[0] == toks.shape[0]
+        # Uniform random bucket per row. Combined with the within-bucket
+        # shuffle in pass 2, this is a uniform global permutation.
+        assign = self.rng.integers(0, self.n_buckets, size=acts.shape[0])
+        for b in range(self.n_buckets):
+            m = assign == b
+            if not m.any():
+                continue
+            acts[m].tofile(self.act_f[b])
+            toks[m].tofile(self.tok_f[b])
+            self.counts[b] += int(m.sum())
 
-    def flush(self) -> None:
-        if self.fill == 0:
-            return
-        acts = self.acts[: self.fill]
-        toks = self.toks[: self.fill]
+    def close(self) -> None:
+        for f in self.act_f + self.tok_f:
+            f.close()
 
-        # The alignment guarantee, checked rather than assumed. A mismatch here
-        # would produce a cache that trains fine and mislabels every feature.
+
+def finalize_buckets(out_dir: Path, cfg: Config, counts: np.ndarray,
+                     rng: np.random.Generator) -> list[int]:
+    """Pass 2: shuffle within each bucket and write .npy shards."""
+    shard_rows: list[int] = []
+    for b in tqdm(range(len(counts)), desc="pass 2 (shuffle)", unit="shard"):
+        n = int(counts[b])
+        acts = np.fromfile(out_dir / f"_raw_acts_{b:05d}.bin", dtype=np.float16).reshape(n, cfg.d_model)
+        toks = np.fromfile(out_dir / f"_raw_toks_{b:05d}.bin", dtype=np.int32)
+
         if acts.shape[0] != toks.shape[0]:
             raise RuntimeError(
-                f"shard {self.shard_idx}: activation rows ({acts.shape[0]}) != "
-                f"token rows ({toks.shape[0]}); refusing to write a misaligned cache"
+                f"bucket {b}: {acts.shape[0]} activation rows vs {toks.shape[0]} token rows; "
+                f"refusing to write a misaligned cache"
             )
 
-        np.save(self.out_dir / f"acts_{self.shard_idx:05d}.npy", acts)
-        np.save(self.out_dir / f"toks_{self.shard_idx:05d}.npy", toks)
-        self.shard_rows.append(int(acts.shape[0]))
-        self.shard_idx += 1
-        self.fill = 0
+        # One index array applied to both -- this is what preserves alignment
+        # through the permutation.
+        perm = rng.permutation(n)
+        np.save(out_dir / f"acts_{b:05d}.npy", acts[perm])
+        np.save(out_dir / f"toks_{b:05d}.npy", toks[perm])
+        shard_rows.append(n)
 
-    @property
-    def total_rows(self) -> int:
-        return sum(self.shard_rows)
+        (out_dir / f"_raw_acts_{b:05d}.bin").unlink()
+        (out_dir / f"_raw_toks_{b:05d}.bin").unlink()
+        del acts, toks, perm
+    return shard_rows
 
 
 def capture(cfg: Config, fwd_batch: int, overwrite: bool) -> None:
@@ -207,19 +214,24 @@ def capture(cfg: Config, fwd_batch: int, overwrite: bool) -> None:
     bos_id = tokenizer.bos_token_id
     stop_layer = stop_layer_for(cfg.hook_name)
 
-    writer = ShardWriter(out_dir, cfg)
-    print(f"shard size: {writer.rows_per_shard:,} rows "
-          f"({writer.rows_per_shard * cfg.d_model * 2 / 1024**3:.2f}GB)")
+    n_buckets = max(1, int(np.ceil(cfg.activation_bytes / TARGET_BUCKET_BYTES)))
+    rng = np.random.default_rng(WRITE_SHUFFLE_SEED)
+    writer = BucketWriter(out_dir, cfg, n_buckets, rng)
+    print(f"buckets: {n_buckets} (~{cfg.activation_bytes / n_buckets / 1024**3:.2f}GB each)")
+    print(f"write-time shuffle seed: {WRITE_SHUFFLE_SEED} (fixed for all runs)")
+
+    # Running accumulators for the normalisation scalar. Computed over the
+    # whole cache in one pass so it is a property of the *data*, not of any run.
+    norm_sum, norm_count = 0.0, 0
 
     seq_iter = iter_sequences(cfg, tokenizer, bos_id)
     n_done = 0
     batch: list[list[int]] = []
     exhausted = False
 
-    pbar = tqdm(total=cfg.n_seqs, unit="seq")
+    pbar = tqdm(total=cfg.n_seqs, desc="pass 1 (capture)", unit="seq")
     with torch.no_grad():
         while n_done < cfg.n_seqs:
-            # ---- gather one forward batch --------------------------------
             batch.clear()
             while len(batch) < min(fwd_batch, cfg.n_seqs - n_done):
                 try:
@@ -231,13 +243,8 @@ def capture(cfg: Config, fwd_batch: int, overwrite: bool) -> None:
                 break
 
             tokens = torch.tensor(batch, dtype=torch.long, device=device)
-
-            # names_filter + stop_at_layer: cache exactly one tensor and skip
-            # every block above the hook point.
             _, cache = model.run_with_cache(
-                tokens,
-                names_filter=cfg.hook_name,
-                stop_at_layer=stop_layer,
+                tokens, names_filter=cfg.hook_name, stop_at_layer=stop_layer
             )
             acts = cache[cfg.hook_name]  # [batch, seq_len, d_model]
 
@@ -247,16 +254,16 @@ def capture(cfg: Config, fwd_batch: int, overwrite: bool) -> None:
             else:
                 tok_out = tokens
 
-            # Flatten [batch, pos, d_model] -> [batch*pos, d_model]. Both
-            # tensors are flattened with the same row-major ordering, which is
-            # what makes row i correspond in both files.
-            acts_np = acts.reshape(-1, cfg.d_model).to(torch.float16).cpu().numpy()
+            flat = acts.reshape(-1, cfg.d_model)
+            norm_sum += flat.norm(dim=-1).sum().item()
+            norm_count += flat.shape[0]
+
+            acts_np = flat.to(torch.float16).cpu().numpy()
             toks_np = tok_out.reshape(-1).to(torch.int32).cpu().numpy()
 
             # A BOS surviving into the cache means BOS handling is wrong
             # somewhere upstream, and the consequence is a handful of rows with
             # ~27x the norm of everything else quietly dominating the MSE.
-            # Cheap to check per batch; expensive to discover in Phase 5.
             if cfg.drop_bos:
                 n_bos = int((toks_np == bos_id).sum())
                 if n_bos:
@@ -266,25 +273,32 @@ def capture(cfg: Config, fwd_batch: int, overwrite: bool) -> None:
                     )
 
             writer.add(acts_np, toks_np)
-
             n_done += len(batch)
             pbar.update(len(batch))
-
             if exhausted:
                 break
     pbar.close()
-    writer.flush()
+    writer.close()
 
     if n_done < cfg.n_seqs:
-        # Not fatal, but it changes the compute budget, so it must be loud and
-        # it must end up in the manifest rather than only in a scrollback buffer.
         print(
             f"\nWARNING: corpus exhausted after {n_done:,} sequences, "
             f"short of the requested {cfg.n_seqs:,}.\n"
-            f"         {cfg.dataset_name} did not contain enough text at "
-            f"seq_len={cfg.seq_len}. Actual epoch count will be higher than "
-            f"config predicts."
+            f"         Actual epoch count will be higher than config predicts."
         )
+
+    shard_rows = finalize_buckets(out_dir, cfg, writer.counts, rng)
+
+    # ---- normalisation scalar -------------------------------------------
+    mean_norm = norm_sum / norm_count
+    target_norm = float(np.sqrt(cfg.d_model))
+    scale = target_norm / mean_norm
+    # Why a single global scalar is safe here specifically: it is a uniform
+    # dilation. It cannot rotate anything, so every decoder direction and every
+    # cross-seed cosine similarity -- the quantities the whole experiment is
+    # built on -- is unchanged by it. It only moves the activations onto the
+    # scale that l1_coeff is defined against, so the sparsity penalty is
+    # comparable with published values instead of being a rounding error.
 
     manifest = {
         "preset": cfg.preset,
@@ -298,17 +312,22 @@ def capture(cfg: Config, fwd_batch: int, overwrite: bool) -> None:
         "rows_per_seq": cfg.tokens_per_seq,
         "n_seqs_requested": cfg.n_seqs,
         "n_seqs_captured": n_done,
-        "total_rows": writer.total_rows,
-        "n_shards": len(writer.shard_rows),
-        "shard_rows": writer.shard_rows,
-        "rows_per_shard_nominal": writer.rows_per_shard,
+        "total_rows": int(sum(shard_rows)),
+        "n_shards": len(shard_rows),
+        "shard_rows": shard_rows,
         "act_dtype": "float16",
         "tok_dtype": "int32",
-        "shuffled_on_disk": False,  # asserted for the reader's benefit
+        "shuffled_on_disk": True,
+        "write_shuffle_seed": WRITE_SHUFFLE_SEED,
+        # Read by every run; never recomputed per run.
+        "mean_activation_norm": mean_norm,
+        "norm_scale": scale,
+        "norm_target": target_norm,
     }
     (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=2))
 
-    print(f"\nwrote {writer.total_rows:,} rows across {len(writer.shard_rows)} shard(s)")
+    print(f"\nwrote {sum(shard_rows):,} rows across {len(shard_rows)} shard(s)")
+    print(f"mean ||x|| = {mean_norm:.2f} -> norm_scale = {scale:.6f} (target {target_norm:.2f})")
     print(f"manifest: {out_dir / 'manifest.json'}")
 
 
