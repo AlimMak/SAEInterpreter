@@ -283,3 +283,38 @@ indices. The l1 mistake is the other kind: I measured a real quantity at the
 wrong time. L0 starts at half of d_sae because half the features fire at
 initialisation, and it takes thousands of steps to come down, so a 400-step
 sweep tells you about initialisation and nothing about your sparsity penalty."
+
+---
+
+## Phase 3.5 — Landing the Mac session's work on the RTX box, and the real-scale check
+
+The commit above (normalization, two-shuffle sampler, loss recovered) was done
+on the Mac and pushed, but this machine's `main` had never been pulled, so at
+the start of this session it still looked like Phase 3 raw. Nearly redid it
+from scratch before `git push` bounced with "fetch first" and surfaced the
+real history. Lesson: `git fetch` before reconstructing anything a past
+session might already have shipped.
+
+Ran it here to confirm it isn't Mac-specific: `capture.py --preset smoke`
+reproduced `mean ||x|| = 101.76 -> norm_scale = 0.272329` exactly, and
+`test_sampler.py` reproduced the same Arm B overlap (`mean 43.2, max 52 vs
+26.4 expected`) byte-for-byte. Cross-machine determinism holds.
+
+**The number that actually matters — full preset, RTX 2070 Super, 12.7M rows:**
+
+```
+buffer: 262,144 rows (2.1% of cache)
+Arm B batch-0 overlap at chance  -- 0/4096 rows vs 1.3 expected by chance
+overlap stays at chance across steps  -- mean 0.0, max 0 vs 1.3 expected
+```
+
+Matches the Mac's own full-scale number (`0.0/4096 vs 1.3 chance`) exactly.
+At this scale the buffer is only 2.1% of the cache, so the chance-level
+expectation itself is under 2 rows per 4096-row batch — a run of zeros here
+isn't a sign of anything, it's what a Poisson mean of 1.3 looks like most of
+the time. The write-time shuffle plus read-time buffer costs the experiment
+nothing at the scale the ten real runs actually read.
+
+Added `--preset` to `test_sampler.py` (defaults to `smoke`) rather than
+writing a second script, since the checks that matter are identical — only
+the scale changes, and the scale is exactly the thing chance depends on.

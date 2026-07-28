@@ -14,11 +14,18 @@ overlap test below is the check: if two runs with different data_seeds draw
 batches that overlap at chance rate, batch composition is still effectively
 independent between arms and the experiment is intact.
 
-Run:  python test_sampler.py
+Run:  python test_sampler.py [--preset smoke|full]
+
+Defaults to smoke (fast, always available). Pass --preset full to re-run the
+same checks against the real cache the ten runs actually read -- in
+particular the Arm B overlap number, which is scale-dependent (chance is
+BATCH^2/total_rows, so it shrinks as the cache grows) and is the number that
+actually needs to hold at the scale that matters.
 """
 
 from __future__ import annotations
 
+import argparse
 import sys
 
 import numpy as np
@@ -37,7 +44,9 @@ def check(name: str, ok: bool, detail: str = "") -> None:
         failures.append(name)
 
 
-cfg = get_config("smoke")
+_p = argparse.ArgumentParser(description=__doc__)
+_p.add_argument("--preset", default="smoke", choices=["smoke", "full"])
+cfg = get_config(_p.parse_args().preset)
 store = ActivationStore(cfg.act_dir)
 print(f"cache: {store.total_rows:,} rows, {store.manifest['n_shards']} shard(s), "
       f"shuffled_on_disk={store.manifest['shuffled_on_disk']}, "
