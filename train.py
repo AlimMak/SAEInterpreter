@@ -138,6 +138,21 @@ def train(
                                         cfg.hook_name, store.norm_scale))
             log_f.write(json.dumps(m) + "\n")
             log_f.flush()
+            if m["l0"] > cfg.d_model:
+                # Not a hard assert: L0 starts near d_sae/2 for every run and
+                # spends its first several hundred-to-thousand steps above
+                # d_model as a matter of course, so asserting here would kill
+                # every run at step 0. The failure mode this catches is a run
+                # that never comes down -- d_sae (12288) >> d_model (768)
+                # means any L0 above d_model can span the activation space and
+                # reconstruct near-perfectly without having found a sparse
+                # decomposition. EV is trivial, not good, whenever this holds.
+                print(
+                    f"WARNING step {step}: L0={m['l0']:.1f} > d_model={cfg.d_model} "
+                    f"-- reconstruction can be near-perfect from spanning coverage "
+                    f"alone here; EV={m['explained_variance']:.3f} is not evidence "
+                    f"of a sparse decomposition yet."
+                )
             if not quiet:
                 lr_s = f"  LR {m['loss_recovered']:.3f}" if "loss_recovered" in m else ""
                 print(f"step {step:>6}  mse {m['mse']:>8.3f}  L0 {m['l0']:>8.1f}  "
