@@ -1,145 +1,171 @@
 # Are SAE features real, or artifacts of the seed?
 
-Sparse autoencoders trained on GPT-2 small's residual stream, plus a
-reproducibility audit of the features they find.
+Across five sparse autoencoders trained on byte-identical GPT-2-small
+activations — differing only in the weight-initialisation seed, everything
+else pinned — only **6.9% of features reproduce at cosine similarity ≥0.9**
+against all four other seeds, and **30% reproduce at ≥0.7**, against a chance
+baseline of **0.14** from matching against random unit-norm dictionaries of
+the same size. Most of what a single SAE finds is not there when you look
+again with a different seed.
 
-Most SAE projects train one autoencoder, find an attractive feature, and stop.
-This one asks the question that comes next: **if you retrain with a different
-random seed, do you get the same features back?** And then the question after
-that: **does a feature's reproducibility predict whether you can actually steer
-the model with it?**
+## The headline result
 
-A feature that vanishes when you change the seed is not a fact about GPT-2. It
-is a fact about that training run.
+Reproducibility isn't one number — it's a curve, because "the same feature"
+is a matter of how strict a match you require. This is Arm A and Arm B (5
+seeds each) against the null:
 
-## The experiment
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="results/full/repro_threshold_curve_dark.png">
+  <img src="results/full/repro_threshold_curve_light.png" alt="Fraction of features clearing a cosine-similarity threshold against all 4 same-arm peers, swept 0.17-0.92, for Arm A, Arm B, and a random-dictionary null. Both arms track closely; null sits near zero throughout.">
+</picture>
 
-Ten SAEs are trained on one byte-identical cache of activations, in two arms:
+Same underlying data with no threshold applied at all — every feature's
+matched cosine similarity to each of its peers, plotted as a distribution:
 
-| Arm | `seed` (init) | `data_seed` (batch order) | Question it answers |
-|-----|---------------|---------------------------|---------------------|
-| A   | 0–4           | fixed at 0                | Are features stable to **initialisation**? |
-| B   | 0–4           | follows `seed`            | Are features stable to **rerunning the script**? |
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="results/full/repro_distribution_dark.png">
+  <img src="results/full/repro_distribution_light.png" alt="Distribution of Hungarian-matched cosine similarities, Arm A vs Arm B vs null. Both arms form a broad right-skewed distribution well separated from a sharp null peak near 0.13-0.15.">
+</picture>
 
-Features are matched across runs by maximum cosine similarity of their decoder
-directions. A feature's *reproducibility score* is how consistently it finds a
-high-similarity partner in the other runs of its arm.
+Both arms are far from chance and nearly indistinguishable from each other —
+see [Limitations](#limitations) for what that arm comparison can and can't
+support.
 
-The gap between Arm A and Arm B is the interesting number: it isolates how much
-of the instability comes from **what the model saw in what order**, as opposed
-to where it started.
+## Method, briefly
 
-## Install
+- **Model / hook point:** GPT-2 small, `blocks.8.hook_resid_pre` (layer 8 of
+  12, residual stream, `d_model=768`).
+- **Data:** 12.7M activations captured from 100k sequences of `pile-10k`,
+  frozen to disk (fp16, ~18.2GB) so every one of the ten runs reads
+  byte-identical data — the whole experiment depends on that.
+- **SAE:** TopK (Gao et al., 2024), `k=30`, `d_sae=12288` (16× expansion),
+  decoder rows held at unit norm throughout training.
+- **Matching:** decoder rows are directionally comparable (unit norm), so
+  cross-run correspondence is posed as a bipartite matching problem and
+  solved with Hungarian assignment (`scipy.optimize.linear_sum_assignment`),
+  not greedy max-cosine — greedy's collision rate against a random
+  dictionary measured **67%**, i.e. two-thirds of "best matches" were
+  claimed by more than one feature.
+- **Null:** each real decoder is also matched against independently drawn
+  random unit-norm dictionaries of the same size, so every threshold above
+  is read off a measured chance level, not assumed against zero.
 
-Python **3.12**. Not 3.13 — the TransformerLens dependency stack does not have
-reliable wheels there yet.
+## Why TopK, not L1
+
+The first attempt used a standard L1 penalty. It never worked, and the
+reason is structural, not a tuning miss: L1 penalizes `sum(|f_i|)`, which by
+construction can't distinguish 30 features firing at magnitude ~5 from 1000+
+firing at magnitude ~0.15 when both sum to the same budget. A 100×
+`l1_coeff` sweep (six values from `2e-3` to `2e-1`, then a narrower pass
+across the transition) never got near the `L0≈30` target — it found two
+failure regimes instead, a runaway dead-feature cascade below the transition
+and non-convergence above it, with a flat floor around `L0≈1095` — **36×**
+the target — everywhere in between:
+
+| `l1_coeff` | L0 | dead |
+|---|---|---|
+| 0.002 | 1221 | 246 |
+| 0.005 | 1114 | 6134 (still climbing) |
+| 0.0126 | 1095 | 1106 |
+| 0.0154 | 1099 | 204 (stable) |
+| 0.0182 | 1122 | 23 (stable) |
+| 0.0215 | 1226 | 1 |
+| 0.0254 | 1601 | 0 |
+| 0.032 – 0.2 | 1487 – 2482 | 0 |
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="results/full/l1_sweep_frontier_dark.png">
+  <img src="results/full/l1_sweep_frontier_light.png" alt="L0 vs explained-variance frontier across the l1_coeff sweep, showing no point near the L0=30 target.">
+</picture>
+
+Decoder-norm inflation (the usual way an SAE escapes L1) was ruled out by
+direct measurement — norms were pinned at exactly 1.0 throughout. TopK
+replaces the penalty with a structural constraint (keep the `k` largest
+pre-activations per token, zero the rest), and the very first run hit the
+target exactly: `L0=30.0` from step 0, `EV=0.867`, `dead=2/12288`,
+`loss_recovered=0.927`. Full diagnostic trail —
+decoder-norm checks, the optimizer-failure hypothesis that didn't survive a
+corrected loss calculation, and a mutual-incoherence check that came back
+genuinely mixed — in [NOTES.md](NOTES.md), Phases 4-5. Kept, not deleted:
+the L1 implementation, both sweep scripts, and both result files are still
+in this repo. The sweep is a result, not a false start.
+
+## Limitations
+
+Stated here rather than left for a reviewer to find:
+
+- **One layer, one model.** `blocks.8.hook_resid_pre` on GPT-2 small only.
+  Nothing here claims to generalise to other layers or larger models.
+- **~4.8 epochs over 12.7M unique activations** (15,000 steps × 4096 batch),
+  against the hundreds of millions of unique activations used in published
+  SAE work. This biases the result in a specific, statable direction: heavy
+  re-epoching gives each seed more room to fit noise in the specific
+  activations it happened to revisit, which **inflates** measured fragility.
+  The reproducibility numbers above should be read as a **lower bound** on
+  true stability — a larger-scale run would likely reproduce features more
+  consistently than shown here, not less.
+- **Cosine similarity of decoder directions is one definition of "the same
+  feature."** Activation-pattern correlation across held-out data is a
+  complementary test that was not run.
+- **5 seeds per arm.** Enough to see the shape of the distribution, not
+  enough to tightly characterise its tail.
+- **The Arm A vs Arm B comparison is inconclusive at this scale**, not a
+  null result. A two-sample KS test between their matched-similarity
+  distributions found a statistically real difference (`p=5.1e-5`) — but
+  with `n≈240,000` that test has power to detect a trivial effect, and the
+  statistic itself (`0.0066`, max CDF gap under 1%) says the practical
+  difference is negligible. This experiment can't support "data order adds
+  no extra instability," and it can't support "data order matters,"
+  either — see [NOTES.md](NOTES.md) Phase 5 for the full readout.
+- **Steering hasn't been run.** Reproducibility here is a geometric
+  property of decoder directions; whether a reproducible feature is also a
+  *functionally useful* one — whether steering with it does what the
+  max-activating examples suggest — is Phase 6, not yet done. A feature
+  could be highly reproducible and functionally inert, or fragile-looking
+  and still steerable. That link is future work.
+
+## Reproduce it
+
+Python 3.12 (TransformerLens doesn't have reliable 3.13 wheels yet):
 
 ```bash
-python3.12 -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
-```
-
-torch installs separately per platform, because the CUDA and Apple Silicon
-builds come from different indexes:
-
-```bash
-# macOS / Apple Silicon (MPS)
-pip install torch
-
-# Windows / RTX 2070 Super (CUDA 12.1)
-pip install torch --index-url https://download.pytorch.org/whl/cu121
-```
-
-Then the shared dependencies:
-
-```bash
+python3.12 -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install torch --index-url https://download.pytorch.org/whl/cu121  # or `pip install torch` on Apple Silicon
 pip install -r requirements.txt
 ```
 
-Verify device selection and print the compute budget for both presets:
+Then, in order:
 
 ```bash
-python config.py
+# 1. Cache activations -- ~18.2GB on disk; every run after this reads it byte-identical
+python capture.py --preset full                                          # not benchmarked this session
+
+# 2. Confirm the two-arm sampler design holds before spending GPU time on it
+python test_sampler.py --preset full                                     # seconds
+
+# 3. L1 sweep -- documented negative result, see "Why TopK, not L1" above
+python sweep_l1.py                                                       # ~114 min (6 points x 15k steps)
+python sweep_l1.py --l1_lo 0.013 --l1_hi 0.03 --n_points 6 \
+    --out results/full/l1_sweep_narrow.json                              # ~95 min (5/6 -- 6th killed externally, not a bug)
+python plot_l1_sweep.py --preset full
+python plot_l1_transition.py --preset full
+
+# 4. TopK confirmation run (single seed) before committing to all ten
+python train.py --preset full --seed 0 --data_seed 0 --topk 30 \
+    --n_steps 15000 --eval_every 5000 --run_name topk_k30                # 40.2 min
+
+# 5. The 10-run reproducibility matrix (Arm A + Arm B, topk=30, saves
+#    run_config.json beside every checkpoint)
+python run_experiment.py                                                 # 3.55 h
+
+# 6. Cross-seed matching, null calibration, and the plots above
+python reproducibility.py                                                # ~13 min (60 Hungarian matches, ~12s each)
 ```
 
-## Presets
+`reproducibility.py` refuses to run against a partial set of the ten
+checkpoints rather than silently reporting a number from whichever runs
+happen to exist.
 
-The project runs on two machines with very different budgets, so there are two
-configs and the difference between them is deliberate.
-
-| | `smoke` (MacBook / MPS) | `full` (RTX 2070 Super / CUDA) |
-|---|---|---|
-| sequences | 5,000 | 100,000 |
-| activations | 635k | 12.7M |
-| cache on disk | ~0.9 GB | ~18.2 GB |
-| train steps | 3,000 | 30,000 |
-| epochs over pool | ~19 | ~9.7 |
-
-**`smoke` is a pipeline test, not an experiment.** It exists to prove the code
-runs end to end before committing hours of GPU time. Nothing is tuned on it and
-no number from it appears in the writeup.
-
-## Running it
-
-```bash
-python capture.py  --preset full                          # Phase 2
-python train.py    --preset full --run_name arm_a_seed0 \
-                   --seed 0 --data_seed 0                 # Phase 3
-python analyze.py  --preset full --run_name arm_a_seed0   # Phase 4
-python reproducibility.py --preset full                   # Phase 5
-python steer.py    --preset full                          # Phase 6
-python correlate.py --preset full                         # Phase 7
-```
-
-## Design notes
-
-**Hook point — `blocks.8.hook_resid_pre`.** Layer 8 of 12. Early layers are
-still dominated by token identity and position; the last layers have begun
-collapsing toward the next-token logit direction, which makes their features
-more about *what comes next* than *what is represented*. Layer 8 is also where
-much published GPT-2-small SAE work sits, so results are comparable.
-
-**Expansion, not compression — `d_sae = 768 × 16 = 12288`.** The superposition
-hypothesis says the model packs more features than it has dimensions. Recovering
-them requires more slots than `d_model`, not fewer.
-
-**BOS is dropped.** Measured at this hook point, `‖BOS‖ = 3119` against a mean
-of `116` for ordinary tokens — about 27×. It's an attention-sink artifact, not
-content. Left in, a squared-error loss is dominated by it and the SAE spends
-features reconstructing one constant vector.
-
-**Activations are cached to disk, not regenerated.** The experiment's validity
-depends on every run seeing identical data. Recomputing per run would introduce
-a second uncontrolled variable.
-
-**No SAELens or other prebuilt SAE library.** The autoencoder, the decoder
-normalisation, and the gradient projection are written from scratch in `sae.py`.
-
-## Known limitations
-
-Named here rather than left for a reviewer to find:
-
-- **Epoch count.** Even the `full` preset revisits its activation pool ~10
-  times, against the hundreds of millions of *unique* activations used in
-  published work. This biases the core result in a specific direction: fewer
-  unique activations means more room for a seed to memorise noise, which
-  **inflates** the measured fragility. The reproducibility numbers should be
-  read as a lower bound on stability.
-- **Dead features are flagged, not resampled.** Resampling is a seed-dependent
-  heuristic intervention; adding it in v1 would confound the thing being
-  measured.
-- **Matching is greedy max-cosine**, which is not a bijection — two features in
-  one run can claim the same partner in another. Reported alongside the score.
-
-## Status
-
-- [x] Phase 1 — scaffold, config, requirements
-- [x] Phase 2 — activation capture
-- [ ] Phase 3 — SAE + training
-- [ ] Phase 4 — max-activating examples + auto-labelling
-- [ ] Phase 5 — cross-seed reproducibility (core experiment)
-- [ ] Phase 6 — steering
-- [ ] Phase 7 — reproducibility vs steering success
-- [ ] Phase 8 — feature browser + writeup
-
-Working notes and per-phase design rationale: [NOTES.md](NOTES.md)
+Working notes, full diagnostic trail, and per-phase design rationale (what
+broke, what I measured to find out why, what I'd say about it in an
+interview): **[NOTES.md](NOTES.md)**.
