@@ -138,7 +138,7 @@ Then, in order:
 
 ```bash
 # 1. Cache activations -- ~18.2GB on disk; every run after this reads it byte-identical
-python capture.py --preset full                                          # not benchmarked this session
+python capture.py --preset full
 
 # 2. Confirm the two-arm sampler design holds before spending GPU time on it
 python test_sampler.py --preset full                                     # seconds
