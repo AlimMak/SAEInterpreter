@@ -111,6 +111,10 @@ class Config:
     # Tuned so L0 (mean number of features firing per token) lands near 30.
     # L0 is the real target; l1_coeff is just the knob that gets us there, and
     # it has to be re-tuned if d_sae or the activation scale changes.
+    topk: int | None = None
+    # If set, train.py uses TopKSparseAutoencoder and l1_coeff is ignored --
+    # see sae.py's module docstring for why. None keeps the L1 path (default),
+    # so every existing config/run is unaffected.
     lr: float = 3e-4
     batch_size: int = 4_096
     # Batch of *activation vectors*, not sequences. 4096 x 12288 fp32 hidden
@@ -244,23 +248,41 @@ SHUFFLE_BUFFER_ROWS = 262_144
 # --------------------------------------------------------------------------
 N_SEEDS = 5
 ARM_A_DATA_SEED = 0  # held constant across Arm A so batch order is identical
+ARM_B_DATA_SEED_OFFSET = 100
+# Arm B's data_seed = seed + ARM_B_DATA_SEED_OFFSET, not the field's usual
+# None ("follow seed"). At seed=0, data_seed=None resolves to 0 -- identical
+# to Arm A's pinned data_seed, making arm_a_seed0 and arm_b_seed0 the exact
+# same config (same seed, same resolved data_seed). The offset is comfortably
+# outside range(N_SEEDS) so no Arm B seed can coincide with ARM_A_DATA_SEED or
+# with each other. See NOTES.md Phase 5 -- the first 10-run experiment predates
+# this fix; its results are unaffected because the analysis never compared
+# across arms, only within each arm's own 5 runs.
 
 
-def experiment_runs(preset: str = "full") -> list[tuple[str, Config]]:
+def experiment_runs(preset: str = "full", **overrides) -> list[tuple[str, Config]]:
     """(run_name, config) for all 10 runs of the reproducibility experiment.
 
     Arm A isolates initialisation. Arm B is the honest "rerun the script" test.
     Both arms read the *same* activation cache on disk -- the data itself is
     never regenerated, only the order it is consumed in changes (and in Arm A,
     not even that).
+
+    **overrides go through get_config for every run identically (e.g.
+    topk=30, n_steps=15000) -- passed once here rather than at each call site
+    so all ten runs cannot silently drift from each other on anything but
+    seed/data_seed, the entire point of this being one function.
     """
     runs: list[tuple[str, Config]] = []
     for seed in range(N_SEEDS):
-        runs.append(
-            (f"arm_a_seed{seed}", get_config(preset, seed=seed, data_seed=ARM_A_DATA_SEED))
-        )
+        runs.append((
+            f"arm_a_seed{seed}",
+            get_config(preset, seed=seed, data_seed=ARM_A_DATA_SEED, **overrides),
+        ))
     for seed in range(N_SEEDS):
-        runs.append((f"arm_b_seed{seed}", get_config(preset, seed=seed, data_seed=None)))
+        runs.append((
+            f"arm_b_seed{seed}",
+            get_config(preset, seed=seed, data_seed=seed + ARM_B_DATA_SEED_OFFSET, **overrides),
+        ))
     return runs
 
 

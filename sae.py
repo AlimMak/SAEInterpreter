@@ -5,10 +5,21 @@ normalisation and the gradient projection below are the two places where an
 SAE differs from a textbook autoencoder, and they are the two things worth
 being able to explain.
 
-Architecture:
+Architecture (L1 variant, SparseAutoencoder):
     f    = ReLU((x - b_dec) @ W_enc + b_enc)      encode
     xhat = f @ W_dec + b_dec                      decode
-    loss = ||x - xhat||^2 + l1 * ||f||_1
+    loss = ||x - xhat||^2 + l1_coeff * ||f||_1
+
+TopKSparseAutoencoder below is the second variant: the l1_coeff sweep in
+NOTES.md found no coefficient, across two orders of magnitude, that reaches
+L0~30 without either a runaway dead-feature cascade or non-convergence. L1
+penalises sum(|f_i|), which cannot distinguish 30 large activations from 1000+
+small ones at the same total budget -- it induces a *magnitude* target, not a
+*count* target, and L0 was only ever a hoped-for side effect. TopK (Gao et al.,
+2024, "Scaling and evaluating sparse autoencoders") makes L0 == k a structural
+property of the forward pass instead: keep the k largest pre-activations per
+token, zero the rest. No coefficient to tune, no activation shrinkage, and
+every run in the reproducibility matrix gets identical L0 by construction.
 """
 
 from __future__ import annotations
@@ -58,12 +69,18 @@ class SparseAutoencoder(nn.Module):
         """
         self.b_dec.data = sample.mean(0).to(self.b_dec.dtype)
 
+    def encode_preacts(self, x: torch.Tensor) -> torch.Tensor:
+        """Pre-activation, before the nonlinearity. Shared by encode() and
+        TopKSparseAutoencoder.encode(), which apply different nonlinearities
+        to the same linear map."""
+        return (x - self.b_dec) @ self.W_enc + self.b_enc
+
     def encode(self, x: torch.Tensor) -> torch.Tensor:
         # Subtracting b_dec before the encoder re-centres the input. Because
         # the decoder adds b_dec back, this makes the autoencoder operate in
         # residual-from-offset space, and keeps the encoder pre-activations
         # from being dominated by a constant the features cannot represent.
-        return torch.relu((x - self.b_dec) @ self.W_enc + self.b_enc)
+        return torch.relu(self.encode_preacts(x))
 
     def decode(self, f: torch.Tensor) -> torch.Tensor:
         return f @ self.W_dec + self.b_dec
@@ -122,6 +139,33 @@ class SparseAutoencoder(nn.Module):
         # Row-wise <g, w> w, with ||w|| = 1 so no denominator is needed.
         parallel = (g * w).sum(dim=-1, keepdim=True) * w
         g -= parallel
+
+
+class TopKSparseAutoencoder(SparseAutoencoder):
+    """L0 == k by construction: keep the k largest pre-activations per token,
+    zero the rest. No L1 term -- see the module docstring for why L1 was
+    dropped rather than retuned again.
+
+    Everything else (decoder unit-norm, gradient projection, b_dec/b_enc,
+    dead-feature tracking) is unchanged; only the nonlinearity differs.
+    """
+
+    def __init__(self, d_model: int, d_sae: int, k: int, dtype: torch.dtype = torch.float32):
+        super().__init__(d_model, d_sae, dtype=dtype)
+        self.k = k
+
+    def encode(self, x: torch.Tensor) -> torch.Tensor:
+        preacts = self.encode_preacts(x)
+        topk_vals, topk_idx = preacts.topk(self.k, dim=-1)
+        # A pre-activation can rank in the top k while still negative (e.g.
+        # early in training, or a token where fewer than k features have a
+        # positive case for firing). Clamping to zero keeps "at most k
+        # nonzero, all positive" -- the ReLU contract -- without changing k
+        # for tokens where every top-k pre-activation is already positive.
+        topk_vals = torch.relu(topk_vals)
+        f = torch.zeros_like(preacts)
+        f.scatter_(-1, topk_idx, topk_vals)
+        return f
 
 
 # ----------------------------------------------------------------------

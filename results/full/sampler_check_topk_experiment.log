@@ -1,0 +1,22 @@
+cache: 12,700,000 rows, 19 shard(s), shuffled_on_disk=True, write_shuffle_seed=1234
+buffer: 262,144 rows (2.1% of cache)
+
+Arm A -- same data_seed, different init seed:
+  PASS  identical batch sequence  -- 12/12 batches identical
+
+Arm B -- data_seed follows init seed:
+  PASS  batch sequences differ
+  PASS  Arm B batch-0 overlap at chance  -- 0/4096 rows vs 1.3 expected by chance
+  PASS  overlap stays at chance across steps  -- mean 0.0, max 0 vs 1.3 expected
+
+Buffer mixing:
+  PASS  consecutive batches are disjoint  -- 0 shared rows between batch 0 and 1
+  PASS  batch is not a contiguous disk block  -- mean index gap 64 (a raw sequential read would be 1)
+  PASS  batch shape
+  PASS  no non-finite values
+
+Normalisation:
+  PASS  scaled to sqrt(d_model)  -- mean||x|| 103.0 -> 27.7 (target 27.7)
+  PASS  scaling preserves direction  -- min cosine 0.99999976
+
+all sampler invariants hold

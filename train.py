@@ -20,7 +20,7 @@ import torch
 
 from config import SHUFFLE_BUFFER_ROWS, Config, get_config, get_device, set_seed
 from data_store import ActivationStore, batch_stream
-from sae import SparseAutoencoder, compute_metrics
+from sae import SparseAutoencoder, TopKSparseAutoencoder, compute_metrics
 
 
 def train(
@@ -43,7 +43,10 @@ def train(
               f"{'  (follows seed)' if cfg.data_seed is None else '  (pinned)'}")
         print(f"rows={store.total_rows:,}  d_sae={cfg.d_sae}  steps={cfg.n_steps:,}  "
               f"epochs={cfg.batch_size * cfg.n_steps / store.total_rows:.1f}")
-        print(f"l1_coeff={cfg.l1_coeff:g}  norm_scale={store.norm_scale:.6f} (from manifest)")
+        if cfg.topk is not None:
+            print(f"topk={cfg.topk} (L1 disabled)  norm_scale={store.norm_scale:.6f} (from manifest)")
+        else:
+            print(f"l1_coeff={cfg.l1_coeff:g}  norm_scale={store.norm_scale:.6f} (from manifest)")
         print(f"decoder grad projection: {'ON' if project_grad else 'OFF (ablation)'}")
 
     # set_seed is called with `seed`, not data_seed: it governs weight init and
@@ -53,7 +56,10 @@ def train(
     # fixed while varying the other.
     set_seed(cfg.seed)
 
-    sae = SparseAutoencoder(cfg.d_model, cfg.d_sae).to(device)
+    if cfg.topk is not None:
+        sae = TopKSparseAutoencoder(cfg.d_model, cfg.d_sae, cfg.topk).to(device)
+    else:
+        sae = SparseAutoencoder(cfg.d_model, cfg.d_sae).to(device)
 
     # b_dec from a sample of real (normalised) activations rather than zeros.
     sample_idx = np.sort(
@@ -95,11 +101,12 @@ def train(
 
         xhat, f = sae(x)
         mse = ((xhat - x) ** 2).sum(-1).mean()
-        # Plain L1 on the feature activations. This is only a valid sparsity
-        # penalty because the decoder rows are held at unit norm -- see
-        # SparseAutoencoder.normalize_decoder.
+        # l1 is always computed and logged, even in TopK mode, so the two
+        # variants stay comparable in metrics.jsonl. Only the L1 variant adds
+        # it to the optimised loss -- TopK's sparsity is structural (see
+        # sae.py), not induced by a penalty term.
         l1 = f.abs().sum(-1).mean()
-        loss = mse + cfg.l1_coeff * l1
+        loss = mse if cfg.topk is not None else mse + cfg.l1_coeff * l1
 
         opt.zero_grad(set_to_none=True)
         loss.backward()
@@ -196,6 +203,8 @@ def main() -> None:
     )
     p.add_argument("--run_name", default=None)
     p.add_argument("--l1_coeff", type=float, default=None, help="override config l1_coeff")
+    p.add_argument("--topk", type=int, default=None,
+                    help="use TopKSparseAutoencoder with this k; disables the L1 term")
     p.add_argument("--n_steps", type=int, default=None, help="override config n_steps")
     p.add_argument(
         "--no_decoder_projection",
@@ -213,6 +222,8 @@ def main() -> None:
     overrides = dict(seed=args.seed, data_seed=args.data_seed)
     if args.l1_coeff is not None:
         overrides["l1_coeff"] = args.l1_coeff
+    if args.topk is not None:
+        overrides["topk"] = args.topk
     if args.n_steps is not None:
         overrides["n_steps"] = args.n_steps
     cfg = get_config(args.preset, **overrides)

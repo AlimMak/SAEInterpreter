@@ -318,3 +318,219 @@ nothing at the scale the ten real runs actually read.
 Added `--preset` to `test_sampler.py` (defaults to `smoke`) rather than
 writing a second script, since the checks that matter are identical — only
 the scale changes, and the scale is exactly the thing chance depends on.
+
+---
+
+## Phase 4 — L1 could not reach the sparsity target; switched to TopK
+
+**What happened.** `arm_a_seed0` (the first of the ten planned reproducibility
+runs, `l1_coeff=5e-4`) plateaued at `L0=1288`, `EV=0.999`. `L0 > d_model=768`
+with `d_sae=12288` means any 1288-feature set can span the 768-dim activation
+space and reconstruct near-perfectly with no sparse decomposition at all —
+`EV=0.999` was measuring spanning coverage, not quality. Stopped the other
+nine runs before launching them.
+
+**Sweep, not a single retune.** Located the true plateau on `arm_a_seed0`
+first (rolling-slope of L0 flattens to noise by step ~13,000) rather than
+repeating an earlier mistake (see Phase 3, item 2) of reading pre-plateau
+dynamics as the l1 response. Swept `l1_coeff` log-spaced 2e-3 to 2e-1 (6
+points, 15,000 steps each — above the plateau floor), then narrowed to
+0.013–0.03 to map the transition precisely (5 of 6 points; the 6th was
+stopped by an external process kill mid-run, not a bug, and wasn't rerun —
+the trend from the other ten points was already unambiguous).
+
+**Result: non-monotonic, two failure regimes, no viable point anywhere in a
+100x range.**
+
+| l1_coeff | L0 | dead |
+|---|---|---|
+| 0.002 | 1221 | 246 |
+| 0.005 | 1114 | 6134 (50%, still accelerating) |
+| 0.0126 | 1095 | 1106 |
+| 0.0154 | 1099 | 204 (stable) |
+| 0.0182 | 1122 | 23 (stable) |
+| 0.0215 | 1226 | 1 |
+| 0.0254 | 1601 | 0 |
+| 0.032–0.2 | 1487–2482 | 0 |
+
+Below ~0.013: a runaway dead-feature cascade (l1=0.005 killed 50% of all
+12,288 features and was still accelerating at step 15,000). Above ~0.02: zero
+dead features, but L0 never converges — it climbs back up, ending denser than
+the low-l1 side. Across the whole range, the lowest L0 ever reached was ~1095
+— 36x the L0≈30 target. No coefficient fixes this; the floor is flat.
+
+**Diagnosed rather than guessed at why, in order:**
+
+1. *Decoder-norm inflation (the standard "SAE escapes L1 by growing decoder
+   norms" failure) — ruled out by direct measurement.* `W_dec` row norms were
+   exactly 1.0 (0/12288 outside 1±1e-4) at both l1 extremes.
+   `normalize_decoder()` is unconditional, every step, immediately after
+   `opt.step()` — confirmed from the source, not paraphrased. L0 was also
+   stable across six count-thresholds spanning 0 to 1e-2 (1465→1311 at the
+   loosest, not an order-of-magnitude swing), so the ~1200-1465 firing
+   features are real, not sub-threshold noise being counted as "firing."
+
+2. *Loss/l1 bookkeeping — exact.* `logged loss == mse + l1_coeff * l1` to
+   float32 precision at both extremes; `l1` is exactly `f.abs().sum(-1).mean()`
+   used in the backward pass, not a different statistic.
+
+3. *"Optimizer failure" (b_enc stuck near zero, never learns to gate
+   features off) — looked plausible, then a loss-arithmetic correction ruled
+   it out.* The first-pass argument ("a hypothetical L0=30 solution is ~3x
+   cheaper under the exact loss being optimized") assumed *perfect*
+   reconstruction at L0=30. Redone honestly using the EV≈0.85 that published
+   SAEs actually achieve at L0≈30 (so mse≈115, not ≈0): the dense solution
+   (loss≈2.61 at l1=0.002) beats the sparse one (loss≈115.3) by ~40x. The
+   optimizer is correctly minimizing the loss it was given; that loss does not
+   prefer the sparse solution once real reconstruction cost is accounted for.
+   b_enc staying near zero is a symptom of that, not an independent bug.
+
+4. *Mutual-incoherence (L1 can't tell concentrated mass from spread mass once
+   the decoder dictionary lets features add constructively) — mixed evidence,
+   not a clean confirmation.* Population-level pairwise cosine similarity
+   between decoder rows sat at the random-unit-vector baseline (mean|cos|
+   0.030 vs baseline sd 0.036, signed mean ≈0) at both l1 extremes — no
+   detectable learned correlation in the dictionary as a whole. The realized
+   reconstruction did show a real ~2x amplification over the pure-orthogonal
+   prediction at the high-l1 end (and a *below*-1.0, mildly destructive
+   ratio at the low-l1 end) — real, but smaller than an initial back-of-
+   envelope estimate suggested, and not the clean smoking gun the hypothesis
+   predicted.
+
+**The one point that doesn't depend on resolving (4) precisely:** L1
+penalizes `sum(|f_i|)` — by construction, it cannot distinguish 30 features at
+magnitude ~5 from 1000+ features at magnitude ~0.15 when both sum to the same
+budget. L0 was always a *hoped-for side effect* of that penalty, never a
+constraint. No coefficient across a 100x sweep produced it.
+
+**Fix: TopK (Gao et al., 2024 — "Scaling and evaluating sparse autoencoders").**
+Added `TopKSparseAutoencoder` in `sae.py` alongside (not replacing) the L1
+`SparseAutoencoder` — keep the k largest pre-activations per token, zero the
+rest, no L1 term. L0 becomes a structural property of the forward pass, not
+something a coefficient has to induce. `Config.topk: int | None` gates it in
+`train.py`; `None` (default) leaves every existing config/run untouched.
+
+**One confirmation run, `full` preset, seed=0/data_seed=0 (same as every
+other run in this investigation), k=30, 15,000 steps:**
+
+```
+L0 = 29.998   EV = 0.8674   mse = 59.25   dead = 2 / 12288
+loss_recovered = 0.9273   (ce_clean 3.591, ce_sae 4.205, ce_zero 12.050)
+wall clock: 40.2 min
+```
+
+L0 lands at exactly k from step 0 (not tuned to get there). EV clears the
+0.85 target and is now a meaningful number, since L0=30 is well under
+`d_model=768`. Dead features: 2, against 204–6134 for any L1 point that
+wasn't still climbing. Loss recovered: 0.927, against a randomly-initialized
+floor of ~0.80 (Phase 3) — first time in this project a sparsity metric and a
+functional (loss-recovered) metric have agreed.
+
+**Kept, not deleted:** the L1 implementation (`SparseAutoencoder` in
+`sae.py`), both sweep scripts (`sweep_l1.py`, the narrow-sweep invocation),
+both result files (`results/full/l1_sweep.json`,
+`results/full/l1_sweep_narrow.json`), and the frontier/transition plots. The
+sweep is a result — a documented negative one — not dead code.
+
+**Still open.** The ten-run reproducibility matrix (`config.experiment_runs`)
+has not been launched. It should use `topk=30`, not `l1_coeff`, once cleared
+to run.
+
+---
+
+## Phase 5 — the 10-run matrix, and a reproducibility analysis that needed a rework
+
+**Convergence check before launching.** On `topk_k30`: EV slope over the last
+3000 steps ≈0.0006/1000 steps (flat, 31-point regression). `loss_recovered`
+only has 4 logged points (`eval_every=5000`) so a true 3000-step rolling slope
+isn't available at that resolution, but the available points (0.924 → 0.937 →
+0.927) move up then down, not a sustained climb. 15,000 steps stands.
+
+**Launch.** `run_experiment.py`: Arm A (seeds 0-4, `data_seed=0` pinned) and
+Arm B (seeds 0-4, `data_seed` following seed), `topk=30`, `n_steps=15000`,
+`eval_every=5000` — identical to the confirmation run. Re-ran the Arm A/B
+batch-overlap sampler check first and logged it
+(`results/full/sampler_check_topk_experiment.log`) so the arm-separation
+invariant is on record for this exact config, not just the original sampler
+validation from Phase 3. All 10 completed in 3.55h (faster than the ~6-7h
+estimate — likely warm disk cache after the first run). Every run landed
+`L0=30.0`, `EV≈0.86-0.87`, `dead≤5`, consistent with the confirmation run.
+
+**First-pass analysis (superseded below) — two problems found on review.**
+`reproducibility.py` matched decoder rows across same-arm runs with Hungarian
+assignment (`scipy.optimize.linear_sum_assignment`, not greedy — greedy's
+collision rate against a random dictionary measured 67.4%, i.e. two-thirds of
+"best matches" were claimed by more than one feature), calibrated a threshold
+against a random-dictionary null (99th percentile = 0.1715), and reported the
+fraction of each feature's 4 same-arm peers that cleared it. Result: Arm A
+mean=0.984, Arm B mean=0.984, both median=1.000. Two things wrong with
+reporting that as the headline:
+
+1. The threshold (0.1715) was far more permissive than real matched
+   similarities (mean 0.69) — "clears the null" and "is the same feature"
+   are different claims, and collapsing to one pass/fail cutoff hid the gap
+   between them.
+2. Both arms saturated near the ceiling (median exactly 1.000) at that
+   threshold, so the arm comparison carried no information — a ceiling
+   effect, not evidence that the arms don't differ. The original writeup of
+   this phase said "data order adds no extra instability"; that claim did
+   not survive review and has been withdrawn.
+
+**Reworked analysis — three threshold-light views on the same underlying
+per-feature, per-peer matched-similarity data** (saved raw, uncollapsed, in
+`results/full/repro_raw_sims/*.npy` this time, so a future rework doesn't
+require re-matching):
+
+1. *Distribution, no threshold.* Arm A: mean=0.6910, median=0.7416,
+   p10/p25/p75/p90 = 0.345/0.540/0.876/0.945. Arm B: mean=0.6900,
+   median=0.7395, p10/p25/p75/p90 = 0.345/0.542/0.874/0.942. Null:
+   mean=0.135, median=0.134. Real matches sit far from null in both arms
+   (visible in `repro_distribution_{light,dark}.png` as two heavily-
+   overlapping broad curves well clear of a sharp null peak near 0.13-0.15)
+   — but Arm A and Arm B are themselves nearly indistinguishable. Two-sample
+   KS test: statistic=0.0066, p=5.08e-05. The p-value is small only because
+   n≈240,000 gives enormous power to detect even a trivial effect; the
+   statistic itself (max CDF gap under 1%) says the practical difference is
+   negligible. **Read this as: a real but tiny distributional difference,
+   not "no difference" and not "a meaningful difference" — the test is
+   underpowered for the second claim and overpowered for the first.**
+2. *Fraction clearing threshold against all 4 peers, swept 0.17→0.92 step
+   0.05* (`repro_threshold_curve_{light,dark}.png`). The two arms track
+   within ~1 percentage point of each other at every threshold in the sweep;
+   null is ~0.0000 throughout (a random-dictionary decoder essentially never
+   clears even the loosest threshold against all 4 fake peers
+   simultaneously). Explicit callouts (computed directly, not read off the
+   swept grid — 0.5/0.7/0.9 don't land on a 0.05-step grid starting at 0.17,
+   and a first version of this script silently never printed them because of
+   exactly that mismatch): at θ=0.5, Arm A=0.5605 vs Arm B=0.5613
+   (diff −0.0008); at θ=0.7, Arm A=0.3005 vs Arm B=0.2935 (diff +0.0070); at
+   θ=0.9, Arm A=0.0688 vs Arm B=0.0676 (diff +0.0012).
+3. *Strict set (θ=0.9 against all 4 peers) — the defensible "these are real"
+   set.* Arm A: 4141/60188 (6.88%). Arm B: 4069/60226 (6.76%). Saved per-run,
+   as original `d_sae` indices, in `results/full/repro_strict_0.9_features.json`
+   — this is the number and the feature set a downstream steering phase
+   should use, not the 98.4%-at-a-permissive-threshold figure from the first
+   pass.
+
+**Honest bottom line on the arm comparison: inconclusive, not null.** Arm A
+and Arm B's matched-similarity distributions are close enough that this
+experiment cannot support a claim that varying data order adds meaningfully
+more feature instability than varying initialisation alone — but a KS test
+run on ~240k paired samples did detect a statistically real (if tiny)
+difference, so "the arms are identical" is also not a claim this data
+supports. The honest statement is: whatever gap exists between the arms is
+small enough that this experiment, at this scale, cannot resolve it either
+way.
+
+**Config bug found and fixed while writing this up: `arm_a_seed0` and
+`arm_b_seed0` were the exact same run.** Arm B's `data_seed` followed `seed`
+(`None`), and `ARM_A_DATA_SEED=0` — so at `seed=0` both arms resolved to
+`seed=0, data_seed=0`, an identical config. Fixed in `config.py` with
+`ARM_B_DATA_SEED_OFFSET=100` (`data_seed = seed + 100` for Arm B, so B's
+data_seeds are 100-104, disjoint from A's pinned 0 and from each other).
+**The 10-run results above predate this fix and are unaffected by it** — the
+reproducibility analysis only ever compares within an arm (each run against
+its 4 same-arm peers), never across arms, so the seed=0 collision was never
+exercised. It would only have mattered for a cross-arm comparison, which
+this analysis doesn't do. Any future cross-arm work should use the fixed
+config (or re-run `arm_b_seed0` under the new `data_seed=100`).

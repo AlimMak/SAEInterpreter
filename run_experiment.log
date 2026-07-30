@@ -1,0 +1,1646 @@
+launching 10 runs: ['arm_a_seed0', 'arm_a_seed1', 'arm_a_seed2', 'arm_a_seed3', 'arm_a_seed4', 'arm_b_seed0', 'arm_b_seed1', 'arm_b_seed2', 'arm_b_seed3', 'arm_b_seed4']
+topk=30  n_steps=15000  eval_every=5000
+
+
+=== run 1/10  arm_a_seed0  seed=0  data_seed=0 ===
+run=arm_a_seed0  device=cuda
+seed=0  data_seed=0  (pinned)
+rows=12,700,000  d_sae=12288  steps=15,000  epochs=4.8
+topk=30 (L1 disabled)  norm_scale=0.268445 (from manifest)
+decoder grad projection: ON
+Loading weights:   0%|          | 0/148 [00:00<?, ?it/s]Loading weights: 100%|##########| 148/148 [00:00<00:00, 3299.49it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loaded pretrained model gpt2-small into HookedTransformer
+step      0  mse  340.132  L0     30.0  EV  0.240  dead     0  LR 0.517
+throughput (first 100 steps): 45,951 samples/s -> ~22.3 min projected
+step    100  mse  214.322  L0     30.0  EV  0.522  dead     0
+step    200  mse  170.174  L0     30.0  EV  0.619  dead     0
+step    300  mse  150.326  L0     30.0  EV  0.665  dead     0
+step    400  mse  137.921  L0     30.0  EV  0.693  dead     0
+step    500  mse  121.358  L0     30.0  EV  0.728  dead     0
+step    600  mse  114.505  L0     30.0  EV  0.745  dead     0
+step    700  mse  107.316  L0     30.0  EV  0.761  dead     0
+step    800  mse  103.337  L0     30.0  EV  0.769  dead     0
+step    900  mse   98.514  L0     30.0  EV  0.779  dead     0
+step   1000  mse   97.174  L0     30.0  EV  0.782  dead     0
+step   1100  mse   91.062  L0     30.0  EV  0.797  dead     0
+step   1200  mse   90.196  L0     30.0  EV  0.799  dead     0
+step   1300  mse   87.947  L0     30.0  EV  0.804  dead     0
+step   1400  mse   84.173  L0     30.0  EV  0.812  dead     0
+step   1500  mse   83.260  L0     30.0  EV  0.814  dead     0
+step   1600  mse   81.867  L0     30.0  EV  0.817  dead     0
+step   1700  mse   80.511  L0     30.0  EV  0.820  dead     0
+step   1800  mse   80.228  L0     30.0  EV  0.822  dead     0
+step   1900  mse   77.895  L0     30.0  EV  0.826  dead     0
+step   2000  mse   76.975  L0     30.0  EV  0.828  dead     0
+step   2100  mse   75.521  L0     30.0  EV  0.832  dead     0
+step   2200  mse   76.034  L0     30.0  EV  0.830  dead     0
+step   2300  mse   74.894  L0     30.0  EV  0.832  dead     0
+step   2400  mse   73.617  L0     30.0  EV  0.836  dead     0
+step   2500  mse   73.073  L0     30.0  EV  0.836  dead     0
+step   2600  mse   74.333  L0     30.0  EV  0.834  dead     0
+step   2700  mse   72.577  L0     30.0  EV  0.838  dead     0
+step   2800  mse   71.851  L0     30.0  EV  0.840  dead     0
+step   2900  mse   71.590  L0     30.0  EV  0.841  dead     0
+step   3000  mse   71.086  L0     30.0  EV  0.841  dead     0
+step   3100  mse   71.168  L0     30.0  EV  0.840  dead     0
+step   3200  mse   71.260  L0     30.0  EV  0.840  dead     0
+step   3300  mse   69.950  L0     30.0  EV  0.843  dead     0
+step   3400  mse   69.534  L0     30.0  EV  0.845  dead     0
+step   3500  mse   68.886  L0     30.0  EV  0.847  dead     0
+step   3600  mse   68.309  L0     30.0  EV  0.846  dead     0
+step   3700  mse   69.410  L0     30.0  EV  0.845  dead     0
+step   3800  mse   67.651  L0     30.0  EV  0.848  dead     0
+step   3900  mse   67.448  L0     30.0  EV  0.849  dead     0
+step   4000  mse   68.419  L0     30.0  EV  0.847  dead     0
+step   4100  mse   67.361  L0     30.0  EV  0.849  dead     0
+step   4200  mse   66.560  L0     30.0  EV  0.852  dead     0
+step   4300  mse   67.156  L0     30.0  EV  0.850  dead     0
+step   4400  mse   66.585  L0     30.0  EV  0.852  dead     0
+step   4500  mse   67.091  L0     30.0  EV  0.850  dead     0
+step   4600  mse   66.219  L0     30.0  EV  0.854  dead     0
+step   4700  mse   66.436  L0     30.0  EV  0.852  dead     0
+step   4800  mse   64.498  L0     30.0  EV  0.855  dead     0
+step   4900  mse   65.194  L0     30.0  EV  0.855  dead     0
+step   5000  mse   65.317  L0     30.0  EV  0.853  dead     0  LR 0.924
+step   5100  mse   66.265  L0     30.0  EV  0.852  dead     0
+step   5200  mse   64.537  L0     30.0  EV  0.856  dead     0
+step   5300  mse   64.614  L0     30.0  EV  0.855  dead     0
+step   5400  mse   65.581  L0     30.0  EV  0.854  dead     0
+step   5500  mse   64.003  L0     30.0  EV  0.857  dead     0
+step   5600  mse   65.228  L0     30.0  EV  0.855  dead     0
+step   5700  mse   64.315  L0     30.0  EV  0.856  dead     0
+step   5800  mse   65.261  L0     30.0  EV  0.854  dead     0
+step   5900  mse   63.392  L0     30.0  EV  0.858  dead     0
+step   6000  mse   64.925  L0     30.0  EV  0.855  dead     0
+step   6100  mse   64.411  L0     30.0  EV  0.857  dead     0
+step   6200  mse   64.017  L0     30.0  EV  0.857  dead     0
+step   6300  mse   63.600  L0     30.0  EV  0.858  dead     0
+step   6400  mse   63.979  L0     30.0  EV  0.857  dead     0
+step   6500  mse   65.019  L0     30.0  EV  0.855  dead     0
+step   6600  mse   63.175  L0     30.0  EV  0.859  dead     0
+step   6700  mse   64.971  L0     30.0  EV  0.856  dead     0
+step   6800  mse   63.376  L0     30.0  EV  0.858  dead     0
+step   6900  mse   63.376  L0     30.0  EV  0.859  dead     0
+step   7000  mse   63.635  L0     30.0  EV  0.858  dead     0
+step   7100  mse   64.123  L0     30.0  EV  0.857  dead     0
+step   7200  mse   62.789  L0     30.0  EV  0.860  dead     0
+step   7300  mse   63.255  L0     30.0  EV  0.860  dead     0
+step   7400  mse   64.620  L0     30.0  EV  0.856  dead     0
+step   7500  mse   63.262  L0     30.0  EV  0.858  dead     0
+step   7600  mse   63.934  L0     30.0  EV  0.857  dead     0
+step   7700  mse   61.798  L0     30.0  EV  0.862  dead     0
+step   7800  mse   62.834  L0     30.0  EV  0.859  dead     0
+step   7900  mse   63.718  L0     30.0  EV  0.857  dead     0
+step   8000  mse   63.725  L0     30.0  EV  0.858  dead     0
+step   8100  mse   63.112  L0     30.0  EV  0.859  dead     0
+step   8200  mse   63.020  L0     30.0  EV  0.859  dead     0
+step   8300  mse   62.709  L0     30.0  EV  0.861  dead     0
+step   8400  mse   62.708  L0     30.0  EV  0.860  dead     0
+step   8500  mse   62.900  L0     30.0  EV  0.859  dead     0
+step   8600  mse   62.608  L0     30.0  EV  0.859  dead     0
+step   8700  mse   62.422  L0     30.0  EV  0.860  dead     0
+step   8800  mse   63.616  L0     30.0  EV  0.858  dead     0
+step   8900  mse   62.370  L0     30.0  EV  0.862  dead     1
+step   9000  mse   63.171  L0     30.0  EV  0.859  dead     1
+step   9100  mse   62.649  L0     30.0  EV  0.860  dead     1
+step   9200  mse   61.774  L0     30.0  EV  0.862  dead     1
+step   9300  mse   62.037  L0     30.0  EV  0.861  dead     1
+step   9400  mse   62.754  L0     30.0  EV  0.859  dead     1
+step   9500  mse   62.173  L0     30.0  EV  0.862  dead     1
+step   9600  mse   61.547  L0     30.0  EV  0.862  dead     1
+step   9700  mse   62.450  L0     30.0  EV  0.861  dead     1
+step   9800  mse   61.812  L0     30.0  EV  0.861  dead     1
+step   9900  mse   62.512  L0     30.0  EV  0.861  dead     1
+step  10000  mse   62.632  L0     30.0  EV  0.859  dead     1  LR 0.937
+step  10100  mse   61.445  L0     30.0  EV  0.863  dead     1
+step  10200  mse   62.981  L0     30.0  EV  0.860  dead     1
+step  10300  mse   61.416  L0     30.0  EV  0.862  dead     2
+step  10400  mse   61.336  L0     30.0  EV  0.863  dead     2
+step  10500  mse   61.087  L0     30.0  EV  0.863  dead     2
+step  10600  mse   61.239  L0     30.0  EV  0.863  dead     2
+step  10700  mse   62.049  L0     30.0  EV  0.862  dead     2
+step  10800  mse   62.008  L0     30.0  EV  0.861  dead     2
+step  10900  mse   61.632  L0     30.0  EV  0.861  dead     2
+step  11000  mse   62.088  L0     30.0  EV  0.861  dead     2
+step  11100  mse   61.349  L0     30.0  EV  0.862  dead     2
+step  11200  mse   60.141  L0     30.0  EV  0.865  dead     2
+step  11300  mse   60.583  L0     30.0  EV  0.864  dead     2
+step  11400  mse   61.559  L0     30.0  EV  0.862  dead     2
+step  11500  mse   61.194  L0     30.0  EV  0.864  dead     2
+step  11600  mse   60.774  L0     30.0  EV  0.864  dead     2
+step  11700  mse   61.463  L0     30.0  EV  0.863  dead     2
+step  11800  mse   60.606  L0     30.0  EV  0.863  dead     2
+step  11900  mse   62.118  L0     30.0  EV  0.861  dead     2
+step  12000  mse   62.145  L0     30.0  EV  0.861  dead     2
+step  12100  mse   61.334  L0     30.0  EV  0.863  dead     2
+step  12200  mse   61.452  L0     30.0  EV  0.862  dead     2
+step  12300  mse   62.330  L0     30.0  EV  0.862  dead     2
+step  12400  mse   60.904  L0     30.0  EV  0.864  dead     2
+step  12500  mse   60.998  L0     30.0  EV  0.864  dead     2
+step  12600  mse   60.746  L0     30.0  EV  0.864  dead     2
+step  12700  mse   61.716  L0     30.0  EV  0.861  dead     2
+step  12800  mse   60.048  L0     30.0  EV  0.866  dead     2
+step  12900  mse   61.968  L0     30.0  EV  0.862  dead     3
+step  13000  mse   62.001  L0     30.0  EV  0.861  dead     3
+step  13100  mse   62.001  L0     30.0  EV  0.861  dead     2
+step  13200  mse   62.056  L0     30.0  EV  0.862  dead     2
+step  13300  mse   60.412  L0     30.0  EV  0.864  dead     2
+step  13400  mse   61.689  L0     30.0  EV  0.862  dead     2
+step  13500  mse   60.161  L0     30.0  EV  0.865  dead     2
+step  13600  mse   61.036  L0     30.0  EV  0.863  dead     2
+step  13700  mse   60.676  L0     30.0  EV  0.864  dead     2
+step  13800  mse   61.047  L0     30.0  EV  0.863  dead     2
+step  13900  mse   60.530  L0     30.0  EV  0.864  dead     2
+step  14000  mse   60.914  L0     30.0  EV  0.863  dead     2
+step  14100  mse   61.886  L0     30.0  EV  0.862  dead     2
+step  14200  mse   61.299  L0     30.0  EV  0.863  dead     2
+step  14300  mse   59.795  L0     30.0  EV  0.866  dead     2
+step  14400  mse   61.039  L0     30.0  EV  0.864  dead     3
+step  14500  mse   60.901  L0     30.0  EV  0.865  dead     3
+step  14600  mse   62.780  L0     30.0  EV  0.860  dead     3
+step  14700  mse   60.343  L0     30.0  EV  0.864  dead     3
+step  14800  mse   61.370  L0     30.0  EV  0.863  dead     3
+step  14900  mse   61.033  L0     30.0  EV  0.863  dead     2
+step  14999  mse   59.253  L0     30.0  EV  0.867  dead     2  LR 0.927
+
+saved -> C:\Projects\sae-feature-reproducibility\checkpoints\full\arm_a_seed0  (2131s)
+--> arm_a_seed0 done in 35.8 min -> C:\Projects\sae-feature-reproducibility\checkpoints\full\arm_a_seed0
+
+=== run 2/10  arm_a_seed1  seed=1  data_seed=0 ===
+run=arm_a_seed1  device=cuda
+seed=1  data_seed=0  (pinned)
+rows=12,700,000  d_sae=12288  steps=15,000  epochs=4.8
+topk=30 (L1 disabled)  norm_scale=0.268445 (from manifest)
+decoder grad projection: ON
+Loading weights:   0%|          | 0/148 [00:00<?, ?it/s]Loading weights: 100%|##########| 148/148 [00:00<00:00, 6159.59it/s]
+Loaded pretrained model gpt2-small into HookedTransformer
+step      0  mse  339.867  L0     30.0  EV  0.240  dead     0  LR 0.386
+throughput (first 100 steps): 56,768 samples/s -> ~18.0 min projected
+step    100  mse  214.269  L0     30.0  EV  0.522  dead     0
+step    200  mse  170.087  L0     30.0  EV  0.619  dead     0
+step    300  mse  150.615  L0     30.0  EV  0.664  dead     0
+step    400  mse  137.883  L0     30.0  EV  0.693  dead     0
+step    500  mse  121.133  L0     30.0  EV  0.728  dead     0
+step    600  mse  114.541  L0     30.0  EV  0.745  dead     0
+step    700  mse  107.584  L0     30.0  EV  0.760  dead     0
+step    800  mse  103.441  L0     30.0  EV  0.769  dead     0
+step    900  mse   98.548  L0     30.0  EV  0.779  dead     0
+step   1000  mse   97.150  L0     30.0  EV  0.782  dead     0
+step   1100  mse   91.149  L0     30.0  EV  0.797  dead     0
+step   1200  mse   90.294  L0     30.0  EV  0.798  dead     0
+step   1300  mse   87.775  L0     30.0  EV  0.805  dead     0
+step   1400  mse   84.442  L0     30.0  EV  0.811  dead     0
+step   1500  mse   83.490  L0     30.0  EV  0.814  dead     0
+step   1600  mse   81.665  L0     30.0  EV  0.817  dead     0
+step   1700  mse   80.639  L0     30.0  EV  0.820  dead     0
+step   1800  mse   80.384  L0     30.0  EV  0.821  dead     0
+step   1900  mse   77.993  L0     30.0  EV  0.825  dead     0
+step   2000  mse   77.055  L0     30.0  EV  0.828  dead     0
+step   2100  mse   75.684  L0     30.0  EV  0.832  dead     0
+step   2200  mse   76.118  L0     30.0  EV  0.830  dead     0
+step   2300  mse   74.991  L0     30.0  EV  0.832  dead     0
+step   2400  mse   73.742  L0     30.0  EV  0.835  dead     0
+step   2500  mse   73.201  L0     30.0  EV  0.836  dead     0
+step   2600  mse   74.351  L0     30.0  EV  0.834  dead     0
+step   2700  mse   72.605  L0     30.0  EV  0.838  dead     0
+step   2800  mse   71.778  L0     30.0  EV  0.840  dead     0
+step   2900  mse   71.502  L0     30.0  EV  0.841  dead     0
+step   3000  mse   71.007  L0     30.0  EV  0.842  dead     0
+step   3100  mse   71.048  L0     30.0  EV  0.841  dead     0
+step   3200  mse   71.088  L0     30.0  EV  0.840  dead     0
+step   3300  mse   69.934  L0     30.0  EV  0.843  dead     0
+step   3400  mse   69.551  L0     30.0  EV  0.845  dead     0
+step   3500  mse   68.763  L0     30.0  EV  0.847  dead     0
+step   3600  mse   68.329  L0     30.0  EV  0.846  dead     0
+step   3700  mse   69.113  L0     30.0  EV  0.845  dead     0
+step   3800  mse   67.656  L0     30.0  EV  0.848  dead     0
+step   3900  mse   67.416  L0     30.0  EV  0.849  dead     0
+step   4000  mse   68.199  L0     30.0  EV  0.848  dead     0
+step   4100  mse   67.434  L0     30.0  EV  0.849  dead     0
+step   4200  mse   66.422  L0     30.0  EV  0.852  dead     0
+step   4300  mse   67.034  L0     30.0  EV  0.850  dead     0
+step   4400  mse   66.451  L0     30.0  EV  0.852  dead     0
+step   4500  mse   66.859  L0     30.0  EV  0.850  dead     0
+step   4600  mse   66.161  L0     30.0  EV  0.854  dead     0
+step   4700  mse   66.242  L0     30.0  EV  0.853  dead     0
+step   4800  mse   64.629  L0     30.0  EV  0.855  dead     0
+step   4900  mse   65.193  L0     30.0  EV  0.855  dead     0
+step   5000  mse   65.144  L0     30.0  EV  0.853  dead     0  LR 0.929
+step   5100  mse   66.067  L0     30.0  EV  0.852  dead     0
+step   5200  mse   64.397  L0     30.0  EV  0.856  dead     0
+step   5300  mse   64.378  L0     30.0  EV  0.856  dead     0
+step   5400  mse   65.631  L0     30.0  EV  0.854  dead     0
+step   5500  mse   64.027  L0     30.0  EV  0.857  dead     0
+step   5600  mse   65.095  L0     30.0  EV  0.855  dead     0
+step   5700  mse   64.182  L0     30.0  EV  0.856  dead     0
+step   5800  mse   64.832  L0     30.0  EV  0.855  dead     0
+step   5900  mse   63.210  L0     30.0  EV  0.858  dead     0
+step   6000  mse   64.901  L0     30.0  EV  0.855  dead     0
+step   6100  mse   64.275  L0     30.0  EV  0.858  dead     0
+step   6200  mse   63.911  L0     30.0  EV  0.857  dead     0
+step   6300  mse   63.497  L0     30.0  EV  0.858  dead     0
+step   6400  mse   63.832  L0     30.0  EV  0.857  dead     0
+step   6500  mse   64.913  L0     30.0  EV  0.856  dead     0
+step   6600  mse   63.096  L0     30.0  EV  0.859  dead     0
+step   6700  mse   64.961  L0     30.0  EV  0.856  dead     0
+step   6800  mse   63.264  L0     30.0  EV  0.859  dead     0
+step   6900  mse   63.166  L0     30.0  EV  0.859  dead     0
+step   7000  mse   63.854  L0     30.0  EV  0.857  dead     0
+step   7100  mse   64.089  L0     30.0  EV  0.857  dead     0
+step   7200  mse   62.464  L0     30.0  EV  0.860  dead     0
+step   7300  mse   62.940  L0     30.0  EV  0.861  dead     0
+step   7400  mse   64.509  L0     30.0  EV  0.857  dead     0
+step   7500  mse   63.098  L0     30.0  EV  0.859  dead     0
+step   7600  mse   63.795  L0     30.0  EV  0.857  dead     0
+step   7700  mse   61.876  L0     30.0  EV  0.862  dead     0
+step   7800  mse   62.654  L0     30.0  EV  0.860  dead     0
+step   7900  mse   63.512  L0     30.0  EV  0.858  dead     0
+step   8000  mse   63.597  L0     30.0  EV  0.858  dead     0
+step   8100  mse   63.170  L0     30.0  EV  0.859  dead     1
+step   8200  mse   62.849  L0     30.0  EV  0.859  dead     1
+step   8300  mse   62.572  L0     30.0  EV  0.861  dead     0
+step   8400  mse   62.678  L0     30.0  EV  0.860  dead     0
+step   8500  mse   63.071  L0     30.0  EV  0.859  dead     0
+step   8600  mse   62.452  L0     30.0  EV  0.859  dead     0
+step   8700  mse   62.239  L0     30.0  EV  0.860  dead     0
+step   8800  mse   63.548  L0     30.0  EV  0.858  dead     0
+step   8900  mse   62.187  L0     30.0  EV  0.862  dead     0
+step   9000  mse   62.974  L0     30.0  EV  0.860  dead     0
+step   9100  mse   62.693  L0     30.0  EV  0.860  dead     0
+step   9200  mse   61.706  L0     30.0  EV  0.862  dead     0
+step   9300  mse   62.052  L0     30.0  EV  0.861  dead     0
+step   9400  mse   62.681  L0     30.0  EV  0.860  dead     0
+step   9500  mse   62.057  L0     30.0  EV  0.862  dead     0
+step   9600  mse   61.580  L0     30.0  EV  0.862  dead     0
+step   9700  mse   62.228  L0     30.0  EV  0.862  dead     0
+step   9800  mse   61.955  L0     30.0  EV  0.860  dead     0
+step   9900  mse   62.402  L0     30.0  EV  0.861  dead     0
+step  10000  mse   62.581  L0     30.0  EV  0.860  dead     0  LR 0.929
+step  10100  mse   61.512  L0     30.0  EV  0.862  dead     0
+step  10200  mse   63.012  L0     30.0  EV  0.860  dead     0
+step  10300  mse   61.441  L0     30.0  EV  0.862  dead     0
+step  10400  mse   61.137  L0     30.0  EV  0.864  dead     0
+step  10500  mse   61.146  L0     30.0  EV  0.863  dead     0
+step  10600  mse   61.300  L0     30.0  EV  0.863  dead     0
+step  10700  mse   62.011  L0     30.0  EV  0.862  dead     1
+step  10800  mse   62.065  L0     30.0  EV  0.861  dead     1
+step  10900  mse   61.562  L0     30.0  EV  0.861  dead     1
+step  11000  mse   62.066  L0     30.0  EV  0.861  dead     3
+step  11100  mse   61.300  L0     30.0  EV  0.862  dead     3
+step  11200  mse   60.109  L0     30.0  EV  0.865  dead     3
+step  11300  mse   60.560  L0     30.0  EV  0.864  dead     2
+step  11400  mse   61.490  L0     30.0  EV  0.862  dead     2
+step  11500  mse   61.075  L0     30.0  EV  0.864  dead     2
+step  11600  mse   60.812  L0     30.0  EV  0.864  dead     3
+step  11700  mse   61.535  L0     30.0  EV  0.863  dead     3
+step  11800  mse   60.468  L0     30.0  EV  0.864  dead     3
+step  11900  mse   62.091  L0     30.0  EV  0.862  dead     3
+step  12000  mse   62.114  L0     30.0  EV  0.861  dead     3
+step  12100  mse   61.177  L0     30.0  EV  0.863  dead     3
+step  12200  mse   61.266  L0     30.0  EV  0.863  dead     3
+step  12300  mse   62.342  L0     30.0  EV  0.862  dead     2
+step  12400  mse   60.719  L0     30.0  EV  0.864  dead     2
+step  12500  mse   61.013  L0     30.0  EV  0.864  dead     2
+step  12600  mse   60.821  L0     30.0  EV  0.864  dead     3
+step  12700  mse   61.763  L0     30.0  EV  0.861  dead     3
+step  12800  mse   59.859  L0     30.0  EV  0.867  dead     3
+step  12900  mse   62.188  L0     30.0  EV  0.861  dead     3
+step  13000  mse   62.093  L0     30.0  EV  0.861  dead     3
+step  13100  mse   61.759  L0     30.0  EV  0.862  dead     3
+step  13200  mse   62.076  L0     30.0  EV  0.862  dead     3
+step  13300  mse   60.295  L0     30.0  EV  0.864  dead     3
+step  13400  mse   61.533  L0     30.0  EV  0.863  dead     3
+step  13500  mse   60.069  L0     30.0  EV  0.865  dead     3
+step  13600  mse   60.887  L0     30.0  EV  0.863  dead     3
+step  13700  mse   60.678  L0     30.0  EV  0.864  dead     3
+step  13800  mse   61.004  L0     30.0  EV  0.863  dead     3
+step  13900  mse   60.572  L0     30.0  EV  0.864  dead     4
+step  14000  mse   61.003  L0     30.0  EV  0.863  dead     4
+step  14100  mse   61.805  L0     30.0  EV  0.862  dead     5
+step  14200  mse   61.247  L0     30.0  EV  0.863  dead     5
+step  14300  mse   59.685  L0     30.0  EV  0.867  dead     6
+step  14400  mse   61.014  L0     30.0  EV  0.865  dead     6
+step  14500  mse   60.910  L0     30.0  EV  0.865  dead     6
+step  14600  mse   62.743  L0     30.0  EV  0.860  dead     5
+step  14700  mse   60.259  L0     30.0  EV  0.865  dead     5
+step  14800  mse   61.275  L0     30.0  EV  0.863  dead     5
+step  14900  mse   61.078  L0     30.0  EV  0.863  dead     6
+step  14999  mse   59.190  L0     30.0  EV  0.868  dead     6  LR 0.920
+
+saved -> C:\Projects\sae-feature-reproducibility\checkpoints\full\arm_a_seed1  (2012s)
+--> arm_a_seed1 done in 33.6 min -> C:\Projects\sae-feature-reproducibility\checkpoints\full\arm_a_seed1
+
+=== run 3/10  arm_a_seed2  seed=2  data_seed=0 ===
+run=arm_a_seed2  device=cuda
+seed=2  data_seed=0  (pinned)
+rows=12,700,000  d_sae=12288  steps=15,000  epochs=4.8
+topk=30 (L1 disabled)  norm_scale=0.268445 (from manifest)
+decoder grad projection: ON
+Loading weights:   0%|          | 0/148 [00:00<?, ?it/s]Loading weights: 100%|##########| 148/148 [00:00<00:00, 7788.08it/s]
+Loaded pretrained model gpt2-small into HookedTransformer
+step      0  mse  340.076  L0     30.0  EV  0.240  dead     0  LR 0.491
+throughput (first 100 steps): 101,686 samples/s -> ~10.1 min projected
+step    100  mse  213.909  L0     30.0  EV  0.523  dead     0
+step    200  mse  169.901  L0     30.0  EV  0.619  dead     0
+step    300  mse  150.139  L0     30.0  EV  0.665  dead     0
+step    400  mse  137.808  L0     30.0  EV  0.693  dead     0
+step    500  mse  121.480  L0     30.0  EV  0.727  dead     0
+step    600  mse  114.515  L0     30.0  EV  0.745  dead     0
+step    700  mse  107.471  L0     30.0  EV  0.760  dead     0
+step    800  mse  103.373  L0     30.0  EV  0.769  dead     0
+step    900  mse   98.556  L0     30.0  EV  0.779  dead     0
+step   1000  mse   97.207  L0     30.0  EV  0.782  dead     0
+step   1100  mse   91.104  L0     30.0  EV  0.797  dead     0
+step   1200  mse   90.221  L0     30.0  EV  0.799  dead     0
+step   1300  mse   87.905  L0     30.0  EV  0.805  dead     0
+step   1400  mse   84.347  L0     30.0  EV  0.811  dead     0
+step   1500  mse   83.430  L0     30.0  EV  0.814  dead     0
+step   1600  mse   81.642  L0     30.0  EV  0.817  dead     0
+step   1700  mse   80.613  L0     30.0  EV  0.820  dead     0
+step   1800  mse   80.415  L0     30.0  EV  0.821  dead     0
+step   1900  mse   77.945  L0     30.0  EV  0.825  dead     0
+step   2000  mse   77.066  L0     30.0  EV  0.828  dead     0
+step   2100  mse   75.546  L0     30.0  EV  0.832  dead     0
+step   2200  mse   76.037  L0     30.0  EV  0.830  dead     0
+step   2300  mse   75.000  L0     30.0  EV  0.832  dead     0
+step   2400  mse   73.867  L0     30.0  EV  0.835  dead     0
+step   2500  mse   73.234  L0     30.0  EV  0.836  dead     0
+step   2600  mse   74.337  L0     30.0  EV  0.834  dead     0
+step   2700  mse   72.803  L0     30.0  EV  0.837  dead     0
+step   2800  mse   71.893  L0     30.0  EV  0.840  dead     0
+step   2900  mse   71.685  L0     30.0  EV  0.840  dead     0
+step   3000  mse   71.187  L0     30.0  EV  0.841  dead     0
+step   3100  mse   71.223  L0     30.0  EV  0.840  dead     0
+step   3200  mse   71.173  L0     30.0  EV  0.840  dead     0
+step   3300  mse   70.015  L0     30.0  EV  0.843  dead     0
+step   3400  mse   69.612  L0     30.0  EV  0.844  dead     0
+step   3500  mse   69.079  L0     30.0  EV  0.846  dead     0
+step   3600  mse   68.368  L0     30.0  EV  0.846  dead     0
+step   3700  mse   69.545  L0     30.0  EV  0.844  dead     0
+step   3800  mse   67.787  L0     30.0  EV  0.848  dead     0
+step   3900  mse   67.486  L0     30.0  EV  0.848  dead     0
+step   4000  mse   68.277  L0     30.0  EV  0.848  dead     0
+step   4100  mse   67.688  L0     30.0  EV  0.849  dead     0
+step   4200  mse   66.462  L0     30.0  EV  0.852  dead     0
+step   4300  mse   67.372  L0     30.0  EV  0.849  dead     0
+step   4400  mse   66.716  L0     30.0  EV  0.851  dead     0
+step   4500  mse   67.210  L0     30.0  EV  0.850  dead     0
+step   4600  mse   66.091  L0     30.0  EV  0.854  dead     0
+step   4700  mse   66.396  L0     30.0  EV  0.852  dead     0
+step   4800  mse   64.647  L0     30.0  EV  0.855  dead     0
+step   4900  mse   65.364  L0     30.0  EV  0.854  dead     0
+step   5000  mse   65.343  L0     30.0  EV  0.853  dead     0  LR 0.919
+step   5100  mse   66.442  L0     30.0  EV  0.852  dead     0
+step   5200  mse   64.504  L0     30.0  EV  0.856  dead     0
+step   5300  mse   64.552  L0     30.0  EV  0.856  dead     0
+step   5400  mse   65.754  L0     30.0  EV  0.853  dead     0
+step   5500  mse   64.070  L0     30.0  EV  0.857  dead     0
+step   5600  mse   65.305  L0     30.0  EV  0.855  dead     0
+step   5700  mse   64.354  L0     30.0  EV  0.856  dead     0
+step   5800  mse   64.985  L0     30.0  EV  0.854  dead     0
+step   5900  mse   63.431  L0     30.0  EV  0.858  dead     0
+step   6000  mse   65.033  L0     30.0  EV  0.855  dead     0
+step   6100  mse   64.364  L0     30.0  EV  0.858  dead     0
+step   6200  mse   63.909  L0     30.0  EV  0.857  dead     0
+step   6300  mse   63.643  L0     30.0  EV  0.858  dead     0
+step   6400  mse   63.985  L0     30.0  EV  0.857  dead     0
+step   6500  mse   65.117  L0     30.0  EV  0.855  dead     0
+step   6600  mse   63.249  L0     30.0  EV  0.859  dead     0
+step   6700  mse   65.098  L0     30.0  EV  0.856  dead     0
+step   6800  mse   63.393  L0     30.0  EV  0.858  dead     0
+step   6900  mse   63.385  L0     30.0  EV  0.859  dead     0
+step   7000  mse   63.941  L0     30.0  EV  0.857  dead     0
+step   7100  mse   64.138  L0     30.0  EV  0.857  dead     0
+step   7200  mse   62.911  L0     30.0  EV  0.859  dead     0
+step   7300  mse   63.289  L0     30.0  EV  0.860  dead     0
+step   7400  mse   64.744  L0     30.0  EV  0.856  dead     0
+step   7500  mse   63.304  L0     30.0  EV  0.858  dead     0
+step   7600  mse   63.795  L0     30.0  EV  0.857  dead     0
+step   7700  mse   61.872  L0     30.0  EV  0.862  dead     0
+step   7800  mse   62.931  L0     30.0  EV  0.859  dead     0
+step   7900  mse   63.657  L0     30.0  EV  0.858  dead     0
+step   8000  mse   63.700  L0     30.0  EV  0.858  dead     0
+step   8100  mse   63.260  L0     30.0  EV  0.859  dead     0
+step   8200  mse   62.910  L0     30.0  EV  0.859  dead     0
+step   8300  mse   62.951  L0     30.0  EV  0.860  dead     0
+step   8400  mse   62.753  L0     30.0  EV  0.860  dead     0
+step   8500  mse   62.912  L0     30.0  EV  0.859  dead     0
+step   8600  mse   62.406  L0     30.0  EV  0.860  dead     0
+step   8700  mse   62.454  L0     30.0  EV  0.860  dead     0
+step   8800  mse   63.598  L0     30.0  EV  0.858  dead     1
+step   8900  mse   62.249  L0     30.0  EV  0.862  dead     1
+step   9000  mse   63.100  L0     30.0  EV  0.859  dead     1
+step   9100  mse   62.603  L0     30.0  EV  0.860  dead     2
+step   9200  mse   61.753  L0     30.0  EV  0.862  dead     2
+step   9300  mse   62.059  L0     30.0  EV  0.861  dead     2
+step   9400  mse   62.704  L0     30.0  EV  0.859  dead     1
+step   9500  mse   62.088  L0     30.0  EV  0.862  dead     1
+step   9600  mse   61.607  L0     30.0  EV  0.862  dead     1
+step   9700  mse   62.381  L0     30.0  EV  0.861  dead     1
+step   9800  mse   61.844  L0     30.0  EV  0.861  dead     1
+step   9900  mse   62.547  L0     30.0  EV  0.861  dead     1
+step  10000  mse   62.670  L0     30.0  EV  0.859  dead     1  LR 0.932
+step  10100  mse   61.500  L0     30.0  EV  0.862  dead     1
+step  10200  mse   62.874  L0     30.0  EV  0.860  dead     1
+step  10300  mse   61.477  L0     30.0  EV  0.862  dead     1
+step  10400  mse   61.204  L0     30.0  EV  0.863  dead     1
+step  10500  mse   61.019  L0     30.0  EV  0.863  dead     3
+step  10600  mse   61.234  L0     30.0  EV  0.863  dead     3
+step  10700  mse   61.993  L0     30.0  EV  0.862  dead     4
+step  10800  mse   61.862  L0     30.0  EV  0.861  dead     4
+step  10900  mse   61.514  L0     30.0  EV  0.861  dead     4
+step  11000  mse   62.180  L0     30.0  EV  0.861  dead     3
+step  11100  mse   61.367  L0     30.0  EV  0.862  dead     3
+step  11200  mse   60.287  L0     30.0  EV  0.864  dead     3
+step  11300  mse   60.631  L0     30.0  EV  0.864  dead     2
+step  11400  mse   61.676  L0     30.0  EV  0.862  dead     3
+step  11500  mse   61.238  L0     30.0  EV  0.864  dead     3
+step  11600  mse   60.722  L0     30.0  EV  0.864  dead     3
+step  11700  mse   61.557  L0     30.0  EV  0.862  dead     2
+step  11800  mse   60.518  L0     30.0  EV  0.863  dead     2
+step  11900  mse   62.143  L0     30.0  EV  0.861  dead     2
+step  12000  mse   62.245  L0     30.0  EV  0.861  dead     2
+step  12100  mse   61.378  L0     30.0  EV  0.863  dead     2
+step  12200  mse   61.373  L0     30.0  EV  0.863  dead     1
+step  12300  mse   62.430  L0     30.0  EV  0.862  dead     1
+step  12400  mse   60.847  L0     30.0  EV  0.864  dead     1
+step  12500  mse   61.019  L0     30.0  EV  0.864  dead     1
+step  12600  mse   60.829  L0     30.0  EV  0.864  dead     1
+step  12700  mse   61.816  L0     30.0  EV  0.861  dead     1
+step  12800  mse   59.930  L0     30.0  EV  0.866  dead     1
+step  12900  mse   62.209  L0     30.0  EV  0.861  dead     1
+step  13000  mse   61.975  L0     30.0  EV  0.861  dead     1
+step  13100  mse   61.808  L0     30.0  EV  0.862  dead     1
+step  13200  mse   62.053  L0     30.0  EV  0.862  dead     1
+step  13300  mse   60.357  L0     30.0  EV  0.864  dead     1
+step  13400  mse   61.647  L0     30.0  EV  0.862  dead     1
+step  13500  mse   60.012  L0     30.0  EV  0.865  dead     1
+step  13600  mse   61.032  L0     30.0  EV  0.863  dead     1
+step  13700  mse   60.757  L0     30.0  EV  0.863  dead     2
+step  13800  mse   61.031  L0     30.0  EV  0.863  dead     2
+step  13900  mse   60.529  L0     30.0  EV  0.864  dead     2
+step  14000  mse   60.940  L0     30.0  EV  0.863  dead     2
+step  14100  mse   61.949  L0     30.0  EV  0.862  dead     2
+step  14200  mse   61.401  L0     30.0  EV  0.863  dead     4
+step  14300  mse   59.785  L0     30.0  EV  0.866  dead     4
+step  14400  mse   61.042  L0     30.0  EV  0.864  dead     4
+step  14500  mse   61.027  L0     30.0  EV  0.865  dead     4
+step  14600  mse   62.867  L0     30.0  EV  0.860  dead     4
+step  14700  mse   60.253  L0     30.0  EV  0.865  dead     5
+step  14800  mse   61.410  L0     30.0  EV  0.863  dead     4
+step  14900  mse   61.171  L0     30.0  EV  0.863  dead     4
+step  14999  mse   59.242  L0     30.0  EV  0.867  dead     3  LR 0.928
+
+saved -> C:\Projects\sae-feature-reproducibility\checkpoints\full\arm_a_seed2  (1095s)
+--> arm_a_seed2 done in 18.3 min -> C:\Projects\sae-feature-reproducibility\checkpoints\full\arm_a_seed2
+
+=== run 4/10  arm_a_seed3  seed=3  data_seed=0 ===
+run=arm_a_seed3  device=cuda
+seed=3  data_seed=0  (pinned)
+rows=12,700,000  d_sae=12288  steps=15,000  epochs=4.8
+topk=30 (L1 disabled)  norm_scale=0.268445 (from manifest)
+decoder grad projection: ON
+Loading weights:   0%|          | 0/148 [00:00<?, ?it/s]Loading weights: 100%|##########| 148/148 [00:00<00:00, 7746.39it/s]
+Loaded pretrained model gpt2-small into HookedTransformer
+step      0  mse  339.788  L0     30.0  EV  0.240  dead     0  LR 0.434
+throughput (first 100 steps): 100,821 samples/s -> ~10.2 min projected
+step    100  mse  214.118  L0     30.0  EV  0.523  dead     0
+step    200  mse  170.071  L0     30.0  EV  0.619  dead     0
+step    300  mse  150.442  L0     30.0  EV  0.665  dead     0
+step    400  mse  137.539  L0     30.0  EV  0.694  dead     0
+step    500  mse  121.074  L0     30.0  EV  0.728  dead     0
+step    600  mse  114.660  L0     30.0  EV  0.745  dead     0
+step    700  mse  107.754  L0     30.0  EV  0.760  dead     0
+step    800  mse  103.523  L0     30.0  EV  0.768  dead     0
+step    900  mse   98.550  L0     30.0  EV  0.779  dead     0
+step   1000  mse   97.219  L0     30.0  EV  0.782  dead     0
+step   1100  mse   90.987  L0     30.0  EV  0.797  dead     0
+step   1200  mse   90.293  L0     30.0  EV  0.798  dead     0
+step   1300  mse   87.724  L0     30.0  EV  0.805  dead     0
+step   1400  mse   84.174  L0     30.0  EV  0.812  dead     0
+step   1500  mse   83.368  L0     30.0  EV  0.814  dead     0
+step   1600  mse   81.645  L0     30.0  EV  0.817  dead     0
+step   1700  mse   80.391  L0     30.0  EV  0.821  dead     0
+step   1800  mse   80.313  L0     30.0  EV  0.822  dead     0
+step   1900  mse   77.975  L0     30.0  EV  0.825  dead     0
+step   2000  mse   77.011  L0     30.0  EV  0.828  dead     0
+step   2100  mse   75.420  L0     30.0  EV  0.832  dead     0
+step   2200  mse   76.029  L0     30.0  EV  0.830  dead     0
+step   2300  mse   74.811  L0     30.0  EV  0.833  dead     0
+step   2400  mse   73.562  L0     30.0  EV  0.836  dead     0
+step   2500  mse   73.137  L0     30.0  EV  0.836  dead     0
+step   2600  mse   74.162  L0     30.0  EV  0.835  dead     0
+step   2700  mse   72.540  L0     30.0  EV  0.838  dead     0
+step   2800  mse   71.932  L0     30.0  EV  0.840  dead     0
+step   2900  mse   71.262  L0     30.0  EV  0.841  dead     0
+step   3000  mse   70.983  L0     30.0  EV  0.842  dead     0
+step   3100  mse   71.094  L0     30.0  EV  0.841  dead     0
+step   3200  mse   71.249  L0     30.0  EV  0.840  dead     0
+step   3300  mse   69.918  L0     30.0  EV  0.843  dead     0
+step   3400  mse   69.417  L0     30.0  EV  0.845  dead     0
+step   3500  mse   68.844  L0     30.0  EV  0.847  dead     0
+step   3600  mse   68.343  L0     30.0  EV  0.846  dead     0
+step   3700  mse   69.272  L0     30.0  EV  0.845  dead     0
+step   3800  mse   67.589  L0     30.0  EV  0.849  dead     0
+step   3900  mse   67.641  L0     30.0  EV  0.848  dead     0
+step   4000  mse   68.203  L0     30.0  EV  0.848  dead     0
+step   4100  mse   67.374  L0     30.0  EV  0.849  dead     0
+step   4200  mse   66.300  L0     30.0  EV  0.852  dead     0
+step   4300  mse   67.108  L0     30.0  EV  0.850  dead     0
+step   4400  mse   66.406  L0     30.0  EV  0.852  dead     0
+step   4500  mse   66.830  L0     30.0  EV  0.850  dead     0
+step   4600  mse   65.991  L0     30.0  EV  0.855  dead     0
+step   4700  mse   66.392  L0     30.0  EV  0.852  dead     0
+step   4800  mse   64.359  L0     30.0  EV  0.856  dead     0
+step   4900  mse   65.162  L0     30.0  EV  0.855  dead     0
+step   5000  mse   65.024  L0     30.0  EV  0.853  dead     0  LR 0.920
+step   5100  mse   66.091  L0     30.0  EV  0.852  dead     0
+step   5200  mse   64.367  L0     30.0  EV  0.856  dead     0
+step   5300  mse   64.367  L0     30.0  EV  0.856  dead     0
+step   5400  mse   65.640  L0     30.0  EV  0.854  dead     0
+step   5500  mse   63.983  L0     30.0  EV  0.857  dead     0
+step   5600  mse   65.170  L0     30.0  EV  0.855  dead     0
+step   5700  mse   64.026  L0     30.0  EV  0.856  dead     0
+step   5800  mse   64.955  L0     30.0  EV  0.855  dead     0
+step   5900  mse   63.056  L0     30.0  EV  0.859  dead     0
+step   6000  mse   64.726  L0     30.0  EV  0.855  dead     0
+step   6100  mse   64.444  L0     30.0  EV  0.857  dead     0
+step   6200  mse   63.639  L0     30.0  EV  0.857  dead     0
+step   6300  mse   63.693  L0     30.0  EV  0.858  dead     0
+step   6400  mse   63.775  L0     30.0  EV  0.857  dead     0
+step   6500  mse   64.952  L0     30.0  EV  0.856  dead     0
+step   6600  mse   63.151  L0     30.0  EV  0.859  dead     0
+step   6700  mse   64.894  L0     30.0  EV  0.856  dead     0
+step   6800  mse   63.098  L0     30.0  EV  0.859  dead     0
+step   6900  mse   63.304  L0     30.0  EV  0.859  dead     0
+step   7000  mse   63.781  L0     30.0  EV  0.857  dead     0
+step   7100  mse   64.057  L0     30.0  EV  0.857  dead     0
+step   7200  mse   62.651  L0     30.0  EV  0.860  dead     1
+step   7300  mse   63.140  L0     30.0  EV  0.860  dead     1
+step   7400  mse   64.559  L0     30.0  EV  0.856  dead     1
+step   7500  mse   63.287  L0     30.0  EV  0.858  dead     0
+step   7600  mse   63.742  L0     30.0  EV  0.857  dead     0
+step   7700  mse   61.817  L0     30.0  EV  0.862  dead     0
+step   7800  mse   62.674  L0     30.0  EV  0.860  dead     0
+step   7900  mse   63.634  L0     30.0  EV  0.858  dead     0
+step   8000  mse   63.478  L0     30.0  EV  0.859  dead     0
+step   8100  mse   63.067  L0     30.0  EV  0.859  dead     0
+step   8200  mse   62.875  L0     30.0  EV  0.859  dead     0
+step   8300  mse   62.560  L0     30.0  EV  0.861  dead     0
+step   8400  mse   62.709  L0     30.0  EV  0.860  dead     0
+step   8500  mse   62.888  L0     30.0  EV  0.859  dead     1
+step   8600  mse   62.231  L0     30.0  EV  0.860  dead     1
+step   8700  mse   62.434  L0     30.0  EV  0.860  dead     1
+step   8800  mse   63.539  L0     30.0  EV  0.858  dead     1
+step   8900  mse   62.335  L0     30.0  EV  0.862  dead     2
+step   9000  mse   63.069  L0     30.0  EV  0.860  dead     2
+step   9100  mse   62.610  L0     30.0  EV  0.860  dead     2
+step   9200  mse   61.627  L0     30.0  EV  0.862  dead     2
+step   9300  mse   62.004  L0     30.0  EV  0.861  dead     2
+step   9400  mse   62.595  L0     30.0  EV  0.860  dead     2
+step   9500  mse   62.190  L0     30.0  EV  0.862  dead     3
+step   9600  mse   61.673  L0     30.0  EV  0.862  dead     3
+step   9700  mse   62.388  L0     30.0  EV  0.861  dead     3
+step   9800  mse   61.839  L0     30.0  EV  0.861  dead     3
+step   9900  mse   62.519  L0     30.0  EV  0.861  dead     3
+step  10000  mse   62.785  L0     30.0  EV  0.859  dead     3  LR 0.926
+step  10100  mse   61.429  L0     30.0  EV  0.863  dead     1
+step  10200  mse   62.761  L0     30.0  EV  0.861  dead     1
+step  10300  mse   61.397  L0     30.0  EV  0.862  dead     1
+step  10400  mse   61.376  L0     30.0  EV  0.863  dead     1
+step  10500  mse   61.104  L0     30.0  EV  0.863  dead     2
+step  10600  mse   61.344  L0     30.0  EV  0.863  dead     2
+step  10700  mse   61.911  L0     30.0  EV  0.862  dead     2
+step  10800  mse   61.970  L0     30.0  EV  0.861  dead     2
+step  10900  mse   61.419  L0     30.0  EV  0.862  dead     2
+step  11000  mse   62.062  L0     30.0  EV  0.861  dead     2
+step  11100  mse   61.093  L0     30.0  EV  0.862  dead     2
+step  11200  mse   60.184  L0     30.0  EV  0.865  dead     2
+step  11300  mse   60.463  L0     30.0  EV  0.865  dead     4
+step  11400  mse   61.542  L0     30.0  EV  0.862  dead     4
+step  11500  mse   61.156  L0     30.0  EV  0.864  dead     4
+step  11600  mse   60.680  L0     30.0  EV  0.864  dead     4
+step  11700  mse   61.561  L0     30.0  EV  0.862  dead     3
+step  11800  mse   60.570  L0     30.0  EV  0.863  dead     3
+step  11900  mse   62.207  L0     30.0  EV  0.861  dead     3
+step  12000  mse   62.107  L0     30.0  EV  0.861  dead     3
+step  12100  mse   61.107  L0     30.0  EV  0.863  dead     4
+step  12200  mse   61.319  L0     30.0  EV  0.863  dead     4
+step  12300  mse   62.365  L0     30.0  EV  0.862  dead     4
+step  12400  mse   60.863  L0     30.0  EV  0.864  dead     3
+step  12500  mse   60.925  L0     30.0  EV  0.865  dead     3
+step  12600  mse   60.758  L0     30.0  EV  0.864  dead     3
+step  12700  mse   61.667  L0     30.0  EV  0.861  dead     3
+step  12800  mse   59.972  L0     30.0  EV  0.866  dead     4
+step  12900  mse   62.116  L0     30.0  EV  0.861  dead     5
+step  13000  mse   61.994  L0     30.0  EV  0.861  dead     4
+step  13100  mse   61.857  L0     30.0  EV  0.861  dead     4
+step  13200  mse   61.837  L0     30.0  EV  0.862  dead     3
+step  13300  mse   60.542  L0     30.0  EV  0.864  dead     3
+step  13400  mse   61.691  L0     30.0  EV  0.862  dead     3
+step  13500  mse   60.012  L0     30.0  EV  0.865  dead     3
+step  13600  mse   61.002  L0     30.0  EV  0.863  dead     3
+step  13700  mse   60.698  L0     30.0  EV  0.863  dead     4
+step  13800  mse   60.993  L0     30.0  EV  0.863  dead     4
+step  13900  mse   60.491  L0     30.0  EV  0.864  dead     4
+step  14000  mse   60.936  L0     30.0  EV  0.863  dead     4
+step  14100  mse   61.953  L0     30.0  EV  0.862  dead     4
+step  14200  mse   61.263  L0     30.0  EV  0.863  dead     3
+step  14300  mse   59.912  L0     30.0  EV  0.866  dead     3
+step  14400  mse   61.115  L0     30.0  EV  0.864  dead     3
+step  14500  mse   60.799  L0     30.0  EV  0.865  dead     3
+step  14600  mse   62.798  L0     30.0  EV  0.860  dead     3
+step  14700  mse   60.232  L0     30.0  EV  0.865  dead     3
+step  14800  mse   61.327  L0     30.0  EV  0.863  dead     3
+step  14900  mse   61.042  L0     30.0  EV  0.863  dead     3
+step  14999  mse   59.014  L0     30.0  EV  0.868  dead     3  LR 0.919
+
+saved -> C:\Projects\sae-feature-reproducibility\checkpoints\full\arm_a_seed3  (1084s)
+--> arm_a_seed3 done in 18.1 min -> C:\Projects\sae-feature-reproducibility\checkpoints\full\arm_a_seed3
+
+=== run 5/10  arm_a_seed4  seed=4  data_seed=0 ===
+run=arm_a_seed4  device=cuda
+seed=4  data_seed=0  (pinned)
+rows=12,700,000  d_sae=12288  steps=15,000  epochs=4.8
+topk=30 (L1 disabled)  norm_scale=0.268445 (from manifest)
+decoder grad projection: ON
+Loading weights:   0%|          | 0/148 [00:00<?, ?it/s]Loading weights: 100%|##########| 148/148 [00:00<00:00, 7995.02it/s]
+Loaded pretrained model gpt2-small into HookedTransformer
+step      0  mse  340.651  L0     30.0  EV  0.238  dead     0  LR 0.442
+throughput (first 100 steps): 101,656 samples/s -> ~10.1 min projected
+step    100  mse  213.459  L0     30.0  EV  0.524  dead     0
+step    200  mse  170.315  L0     30.0  EV  0.618  dead     0
+step    300  mse  150.500  L0     30.0  EV  0.665  dead     0
+step    400  mse  137.547  L0     30.0  EV  0.694  dead     0
+step    500  mse  121.289  L0     30.0  EV  0.728  dead     0
+step    600  mse  114.602  L0     30.0  EV  0.745  dead     0
+step    700  mse  107.765  L0     30.0  EV  0.760  dead     0
+step    800  mse  103.529  L0     30.0  EV  0.768  dead     0
+step    900  mse   98.562  L0     30.0  EV  0.778  dead     0
+step   1000  mse   97.211  L0     30.0  EV  0.782  dead     0
+step   1100  mse   91.108  L0     30.0  EV  0.797  dead     0
+step   1200  mse   90.310  L0     30.0  EV  0.798  dead     0
+step   1300  mse   87.875  L0     30.0  EV  0.805  dead     0
+step   1400  mse   84.229  L0     30.0  EV  0.811  dead     0
+step   1500  mse   83.556  L0     30.0  EV  0.814  dead     0
+step   1600  mse   81.766  L0     30.0  EV  0.817  dead     0
+step   1700  mse   80.669  L0     30.0  EV  0.820  dead     0
+step   1800  mse   80.236  L0     30.0  EV  0.822  dead     0
+step   1900  mse   78.125  L0     30.0  EV  0.825  dead     0
+step   2000  mse   76.966  L0     30.0  EV  0.828  dead     0
+step   2100  mse   75.592  L0     30.0  EV  0.832  dead     0
+step   2200  mse   75.864  L0     30.0  EV  0.831  dead     0
+step   2300  mse   75.075  L0     30.0  EV  0.832  dead     0
+step   2400  mse   73.892  L0     30.0  EV  0.835  dead     0
+step   2500  mse   73.215  L0     30.0  EV  0.836  dead     0
+step   2600  mse   74.105  L0     30.0  EV  0.835  dead     0
+step   2700  mse   72.627  L0     30.0  EV  0.838  dead     0
+step   2800  mse   71.796  L0     30.0  EV  0.840  dead     0
+step   2900  mse   71.430  L0     30.0  EV  0.841  dead     0
+step   3000  mse   70.861  L0     30.0  EV  0.842  dead     0
+step   3100  mse   71.042  L0     30.0  EV  0.841  dead     0
+step   3200  mse   71.060  L0     30.0  EV  0.841  dead     0
+step   3300  mse   69.924  L0     30.0  EV  0.843  dead     0
+step   3400  mse   69.311  L0     30.0  EV  0.845  dead     0
+step   3500  mse   68.801  L0     30.0  EV  0.847  dead     0
+step   3600  mse   68.071  L0     30.0  EV  0.847  dead     0
+step   3700  mse   69.345  L0     30.0  EV  0.845  dead     0
+step   3800  mse   67.570  L0     30.0  EV  0.849  dead     0
+step   3900  mse   67.550  L0     30.0  EV  0.848  dead     0
+step   4000  mse   68.269  L0     30.0  EV  0.848  dead     0
+step   4100  mse   67.351  L0     30.0  EV  0.849  dead     0
+step   4200  mse   66.217  L0     30.0  EV  0.852  dead     0
+step   4300  mse   67.110  L0     30.0  EV  0.850  dead     0
+step   4400  mse   66.507  L0     30.0  EV  0.852  dead     0
+step   4500  mse   66.913  L0     30.0  EV  0.850  dead     0
+step   4600  mse   66.106  L0     30.0  EV  0.854  dead     0
+step   4700  mse   66.364  L0     30.0  EV  0.852  dead     0
+step   4800  mse   64.578  L0     30.0  EV  0.855  dead     0
+step   4900  mse   65.195  L0     30.0  EV  0.855  dead     0
+step   5000  mse   65.102  L0     30.0  EV  0.853  dead     0  LR 0.935
+step   5100  mse   66.096  L0     30.0  EV  0.852  dead     0
+step   5200  mse   64.495  L0     30.0  EV  0.856  dead     0
+step   5300  mse   64.380  L0     30.0  EV  0.856  dead     0
+step   5400  mse   65.680  L0     30.0  EV  0.854  dead     0
+step   5500  mse   64.076  L0     30.0  EV  0.857  dead     0
+step   5600  mse   65.169  L0     30.0  EV  0.855  dead     0
+step   5700  mse   64.311  L0     30.0  EV  0.856  dead     0
+step   5800  mse   64.935  L0     30.0  EV  0.855  dead     0
+step   5900  mse   63.168  L0     30.0  EV  0.859  dead     0
+step   6000  mse   64.876  L0     30.0  EV  0.855  dead     0
+step   6100  mse   64.327  L0     30.0  EV  0.858  dead     0
+step   6200  mse   63.963  L0     30.0  EV  0.857  dead     0
+step   6300  mse   63.552  L0     30.0  EV  0.858  dead     0
+step   6400  mse   63.862  L0     30.0  EV  0.857  dead     0
+step   6500  mse   65.117  L0     30.0  EV  0.855  dead     0
+step   6600  mse   63.072  L0     30.0  EV  0.860  dead     0
+step   6700  mse   64.899  L0     30.0  EV  0.856  dead     0
+step   6800  mse   63.250  L0     30.0  EV  0.859  dead     0
+step   6900  mse   63.366  L0     30.0  EV  0.859  dead     0
+step   7000  mse   63.738  L0     30.0  EV  0.857  dead     0
+step   7100  mse   64.106  L0     30.0  EV  0.857  dead     0
+step   7200  mse   62.656  L0     30.0  EV  0.860  dead     0
+step   7300  mse   63.128  L0     30.0  EV  0.860  dead     0
+step   7400  mse   64.583  L0     30.0  EV  0.856  dead     0
+step   7500  mse   63.243  L0     30.0  EV  0.858  dead     0
+step   7600  mse   63.650  L0     30.0  EV  0.858  dead     0
+step   7700  mse   61.804  L0     30.0  EV  0.862  dead     0
+step   7800  mse   62.703  L0     30.0  EV  0.859  dead     0
+step   7900  mse   63.574  L0     30.0  EV  0.858  dead     1
+step   8000  mse   63.546  L0     30.0  EV  0.859  dead     1
+step   8100  mse   63.077  L0     30.0  EV  0.859  dead     1
+step   8200  mse   62.949  L0     30.0  EV  0.859  dead     1
+step   8300  mse   62.678  L0     30.0  EV  0.861  dead     0
+step   8400  mse   62.687  L0     30.0  EV  0.860  dead     0
+step   8500  mse   62.955  L0     30.0  EV  0.859  dead     0
+step   8600  mse   62.480  L0     30.0  EV  0.859  dead     0
+step   8700  mse   62.485  L0     30.0  EV  0.860  dead     0
+step   8800  mse   63.650  L0     30.0  EV  0.858  dead     0
+step   8900  mse   62.262  L0     30.0  EV  0.862  dead     0
+step   9000  mse   63.094  L0     30.0  EV  0.859  dead     0
+step   9100  mse   62.522  L0     30.0  EV  0.860  dead     0
+step   9200  mse   61.773  L0     30.0  EV  0.862  dead     0
+step   9300  mse   62.078  L0     30.0  EV  0.861  dead     1
+step   9400  mse   62.759  L0     30.0  EV  0.859  dead     1
+step   9500  mse   62.150  L0     30.0  EV  0.862  dead     1
+step   9600  mse   61.471  L0     30.0  EV  0.862  dead     1
+step   9700  mse   62.384  L0     30.0  EV  0.861  dead     1
+step   9800  mse   61.773  L0     30.0  EV  0.861  dead     1
+step   9900  mse   62.646  L0     30.0  EV  0.861  dead     1
+step  10000  mse   62.653  L0     30.0  EV  0.859  dead     1  LR 0.931
+step  10100  mse   61.589  L0     30.0  EV  0.862  dead     2
+step  10200  mse   62.904  L0     30.0  EV  0.860  dead     2
+step  10300  mse   61.445  L0     30.0  EV  0.862  dead     3
+step  10400  mse   61.315  L0     30.0  EV  0.863  dead     4
+step  10500  mse   61.055  L0     30.0  EV  0.863  dead     4
+step  10600  mse   61.285  L0     30.0  EV  0.863  dead     3
+step  10700  mse   61.942  L0     30.0  EV  0.862  dead     4
+step  10800  mse   62.016  L0     30.0  EV  0.861  dead     4
+step  10900  mse   61.492  L0     30.0  EV  0.861  dead     5
+step  11000  mse   62.147  L0     30.0  EV  0.861  dead     4
+step  11100  mse   61.242  L0     30.0  EV  0.862  dead     3
+step  11200  mse   60.219  L0     30.0  EV  0.865  dead     3
+step  11300  mse   60.622  L0     30.0  EV  0.864  dead     2
+step  11400  mse   61.624  L0     30.0  EV  0.862  dead     1
+step  11500  mse   61.188  L0     30.0  EV  0.864  dead     1
+step  11600  mse   60.849  L0     30.0  EV  0.864  dead     1
+step  11700  mse   61.423  L0     30.0  EV  0.863  dead     1
+step  11800  mse   60.552  L0     30.0  EV  0.863  dead     1
+step  11900  mse   62.097  L0     30.0  EV  0.861  dead     1
+step  12000  mse   62.185  L0     30.0  EV  0.861  dead     2
+step  12100  mse   61.235  L0     30.0  EV  0.863  dead     2
+step  12200  mse   61.453  L0     30.0  EV  0.862  dead     1
+step  12300  mse   62.327  L0     30.0  EV  0.862  dead     1
+step  12400  mse   60.747  L0     30.0  EV  0.864  dead     2
+step  12500  mse   60.884  L0     30.0  EV  0.865  dead     2
+step  12600  mse   60.836  L0     30.0  EV  0.864  dead     3
+step  12700  mse   61.855  L0     30.0  EV  0.861  dead     3
+step  12800  mse   59.877  L0     30.0  EV  0.867  dead     4
+step  12900  mse   62.088  L0     30.0  EV  0.861  dead     4
+step  13000  mse   62.007  L0     30.0  EV  0.861  dead     4
+step  13100  mse   61.878  L0     30.0  EV  0.861  dead     4
+step  13200  mse   62.075  L0     30.0  EV  0.862  dead     4
+step  13300  mse   60.474  L0     30.0  EV  0.864  dead     4
+step  13400  mse   61.651  L0     30.0  EV  0.862  dead     5
+step  13500  mse   60.113  L0     30.0  EV  0.865  dead     7
+step  13600  mse   60.968  L0     30.0  EV  0.863  dead     7
+step  13700  mse   60.638  L0     30.0  EV  0.864  dead     7
+step  13800  mse   60.987  L0     30.0  EV  0.863  dead     7
+step  13900  mse   60.495  L0     30.0  EV  0.864  dead     7
+step  14000  mse   61.016  L0     30.0  EV  0.863  dead     6
+step  14100  mse   62.022  L0     30.0  EV  0.861  dead     6
+step  14200  mse   61.470  L0     30.0  EV  0.862  dead     6
+step  14300  mse   59.952  L0     30.0  EV  0.866  dead     5
+step  14400  mse   61.026  L0     30.0  EV  0.865  dead     3
+step  14500  mse   60.893  L0     30.0  EV  0.865  dead     3
+step  14600  mse   62.727  L0     30.0  EV  0.860  dead     3
+step  14700  mse   60.357  L0     30.0  EV  0.864  dead     3
+step  14800  mse   61.309  L0     30.0  EV  0.863  dead     3
+step  14900  mse   60.926  L0     30.0  EV  0.863  dead     3
+step  14999  mse   59.246  L0     30.0  EV  0.867  dead     3  LR 0.928
+
+saved -> C:\Projects\sae-feature-reproducibility\checkpoints\full\arm_a_seed4  (1059s)
+--> arm_a_seed4 done in 17.7 min -> C:\Projects\sae-feature-reproducibility\checkpoints\full\arm_a_seed4
+
+=== run 6/10  arm_b_seed0  seed=0  data_seed=None ===
+run=arm_b_seed0  device=cuda
+seed=0  data_seed=0  (follows seed)
+rows=12,700,000  d_sae=12288  steps=15,000  epochs=4.8
+topk=30 (L1 disabled)  norm_scale=0.268445 (from manifest)
+decoder grad projection: ON
+Loading weights:   0%|          | 0/148 [00:00<?, ?it/s]Loading weights: 100%|##########| 148/148 [00:00<00:00, 7789.26it/s]
+Loaded pretrained model gpt2-small into HookedTransformer
+step      0  mse  340.132  L0     30.0  EV  0.240  dead     0  LR 0.517
+throughput (first 100 steps): 100,087 samples/s -> ~10.2 min projected
+step    100  mse  214.322  L0     30.0  EV  0.522  dead     0
+step    200  mse  170.174  L0     30.0  EV  0.619  dead     0
+step    300  mse  150.326  L0     30.0  EV  0.665  dead     0
+step    400  mse  137.921  L0     30.0  EV  0.693  dead     0
+step    500  mse  121.358  L0     30.0  EV  0.728  dead     0
+step    600  mse  114.505  L0     30.0  EV  0.745  dead     0
+step    700  mse  107.316  L0     30.0  EV  0.761  dead     0
+step    800  mse  103.337  L0     30.0  EV  0.769  dead     0
+step    900  mse   98.514  L0     30.0  EV  0.779  dead     0
+step   1000  mse   97.174  L0     30.0  EV  0.782  dead     0
+step   1100  mse   91.062  L0     30.0  EV  0.797  dead     0
+step   1200  mse   90.196  L0     30.0  EV  0.799  dead     0
+step   1300  mse   87.947  L0     30.0  EV  0.804  dead     0
+step   1400  mse   84.173  L0     30.0  EV  0.812  dead     0
+step   1500  mse   83.260  L0     30.0  EV  0.814  dead     0
+step   1600  mse   81.867  L0     30.0  EV  0.817  dead     0
+step   1700  mse   80.511  L0     30.0  EV  0.820  dead     0
+step   1800  mse   80.228  L0     30.0  EV  0.822  dead     0
+step   1900  mse   77.895  L0     30.0  EV  0.826  dead     0
+step   2000  mse   76.975  L0     30.0  EV  0.828  dead     0
+step   2100  mse   75.521  L0     30.0  EV  0.832  dead     0
+step   2200  mse   76.034  L0     30.0  EV  0.830  dead     0
+step   2300  mse   74.894  L0     30.0  EV  0.832  dead     0
+step   2400  mse   73.617  L0     30.0  EV  0.836  dead     0
+step   2500  mse   73.073  L0     30.0  EV  0.836  dead     0
+step   2600  mse   74.333  L0     30.0  EV  0.834  dead     0
+step   2700  mse   72.577  L0     30.0  EV  0.838  dead     0
+step   2800  mse   71.851  L0     30.0  EV  0.840  dead     0
+step   2900  mse   71.590  L0     30.0  EV  0.841  dead     0
+step   3000  mse   71.086  L0     30.0  EV  0.841  dead     0
+step   3100  mse   71.168  L0     30.0  EV  0.840  dead     0
+step   3200  mse   71.260  L0     30.0  EV  0.840  dead     0
+step   3300  mse   69.950  L0     30.0  EV  0.843  dead     0
+step   3400  mse   69.534  L0     30.0  EV  0.845  dead     0
+step   3500  mse   68.886  L0     30.0  EV  0.847  dead     0
+step   3600  mse   68.309  L0     30.0  EV  0.846  dead     0
+step   3700  mse   69.410  L0     30.0  EV  0.845  dead     0
+step   3800  mse   67.651  L0     30.0  EV  0.848  dead     0
+step   3900  mse   67.448  L0     30.0  EV  0.849  dead     0
+step   4000  mse   68.419  L0     30.0  EV  0.847  dead     0
+step   4100  mse   67.361  L0     30.0  EV  0.849  dead     0
+step   4200  mse   66.560  L0     30.0  EV  0.852  dead     0
+step   4300  mse   67.156  L0     30.0  EV  0.850  dead     0
+step   4400  mse   66.585  L0     30.0  EV  0.852  dead     0
+step   4500  mse   67.091  L0     30.0  EV  0.850  dead     0
+step   4600  mse   66.219  L0     30.0  EV  0.854  dead     0
+step   4700  mse   66.436  L0     30.0  EV  0.852  dead     0
+step   4800  mse   64.498  L0     30.0  EV  0.855  dead     0
+step   4900  mse   65.194  L0     30.0  EV  0.855  dead     0
+step   5000  mse   65.317  L0     30.0  EV  0.853  dead     0  LR 0.924
+step   5100  mse   66.265  L0     30.0  EV  0.852  dead     0
+step   5200  mse   64.537  L0     30.0  EV  0.856  dead     0
+step   5300  mse   64.614  L0     30.0  EV  0.855  dead     0
+step   5400  mse   65.581  L0     30.0  EV  0.854  dead     0
+step   5500  mse   64.003  L0     30.0  EV  0.857  dead     0
+step   5600  mse   65.228  L0     30.0  EV  0.855  dead     0
+step   5700  mse   64.315  L0     30.0  EV  0.856  dead     0
+step   5800  mse   65.261  L0     30.0  EV  0.854  dead     0
+step   5900  mse   63.392  L0     30.0  EV  0.858  dead     0
+step   6000  mse   64.925  L0     30.0  EV  0.855  dead     0
+step   6100  mse   64.411  L0     30.0  EV  0.857  dead     0
+step   6200  mse   64.017  L0     30.0  EV  0.857  dead     0
+step   6300  mse   63.600  L0     30.0  EV  0.858  dead     0
+step   6400  mse   63.979  L0     30.0  EV  0.857  dead     0
+step   6500  mse   65.019  L0     30.0  EV  0.855  dead     0
+step   6600  mse   63.175  L0     30.0  EV  0.859  dead     0
+step   6700  mse   64.971  L0     30.0  EV  0.856  dead     0
+step   6800  mse   63.376  L0     30.0  EV  0.858  dead     0
+step   6900  mse   63.376  L0     30.0  EV  0.859  dead     0
+step   7000  mse   63.635  L0     30.0  EV  0.858  dead     0
+step   7100  mse   64.123  L0     30.0  EV  0.857  dead     0
+step   7200  mse   62.789  L0     30.0  EV  0.860  dead     0
+step   7300  mse   63.255  L0     30.0  EV  0.860  dead     0
+step   7400  mse   64.620  L0     30.0  EV  0.856  dead     0
+step   7500  mse   63.262  L0     30.0  EV  0.858  dead     0
+step   7600  mse   63.934  L0     30.0  EV  0.857  dead     0
+step   7700  mse   61.798  L0     30.0  EV  0.862  dead     0
+step   7800  mse   62.834  L0     30.0  EV  0.859  dead     0
+step   7900  mse   63.718  L0     30.0  EV  0.857  dead     0
+step   8000  mse   63.725  L0     30.0  EV  0.858  dead     0
+step   8100  mse   63.112  L0     30.0  EV  0.859  dead     0
+step   8200  mse   63.020  L0     30.0  EV  0.859  dead     0
+step   8300  mse   62.709  L0     30.0  EV  0.861  dead     0
+step   8400  mse   62.708  L0     30.0  EV  0.860  dead     0
+step   8500  mse   62.900  L0     30.0  EV  0.859  dead     0
+step   8600  mse   62.608  L0     30.0  EV  0.859  dead     0
+step   8700  mse   62.422  L0     30.0  EV  0.860  dead     0
+step   8800  mse   63.616  L0     30.0  EV  0.858  dead     0
+step   8900  mse   62.370  L0     30.0  EV  0.862  dead     1
+step   9000  mse   63.171  L0     30.0  EV  0.859  dead     1
+step   9100  mse   62.649  L0     30.0  EV  0.860  dead     1
+step   9200  mse   61.774  L0     30.0  EV  0.862  dead     1
+step   9300  mse   62.037  L0     30.0  EV  0.861  dead     1
+step   9400  mse   62.754  L0     30.0  EV  0.859  dead     1
+step   9500  mse   62.173  L0     30.0  EV  0.862  dead     1
+step   9600  mse   61.547  L0     30.0  EV  0.862  dead     1
+step   9700  mse   62.450  L0     30.0  EV  0.861  dead     1
+step   9800  mse   61.812  L0     30.0  EV  0.861  dead     1
+step   9900  mse   62.512  L0     30.0  EV  0.861  dead     1
+step  10000  mse   62.632  L0     30.0  EV  0.859  dead     1  LR 0.937
+step  10100  mse   61.445  L0     30.0  EV  0.863  dead     1
+step  10200  mse   62.981  L0     30.0  EV  0.860  dead     1
+step  10300  mse   61.416  L0     30.0  EV  0.862  dead     2
+step  10400  mse   61.336  L0     30.0  EV  0.863  dead     2
+step  10500  mse   61.087  L0     30.0  EV  0.863  dead     2
+step  10600  mse   61.239  L0     30.0  EV  0.863  dead     2
+step  10700  mse   62.049  L0     30.0  EV  0.862  dead     2
+step  10800  mse   62.008  L0     30.0  EV  0.861  dead     2
+step  10900  mse   61.632  L0     30.0  EV  0.861  dead     2
+step  11000  mse   62.088  L0     30.0  EV  0.861  dead     2
+step  11100  mse   61.349  L0     30.0  EV  0.862  dead     2
+step  11200  mse   60.141  L0     30.0  EV  0.865  dead     2
+step  11300  mse   60.583  L0     30.0  EV  0.864  dead     2
+step  11400  mse   61.559  L0     30.0  EV  0.862  dead     2
+step  11500  mse   61.194  L0     30.0  EV  0.864  dead     2
+step  11600  mse   60.774  L0     30.0  EV  0.864  dead     2
+step  11700  mse   61.463  L0     30.0  EV  0.863  dead     2
+step  11800  mse   60.606  L0     30.0  EV  0.863  dead     2
+step  11900  mse   62.118  L0     30.0  EV  0.861  dead     2
+step  12000  mse   62.145  L0     30.0  EV  0.861  dead     2
+step  12100  mse   61.334  L0     30.0  EV  0.863  dead     2
+step  12200  mse   61.452  L0     30.0  EV  0.862  dead     2
+step  12300  mse   62.330  L0     30.0  EV  0.862  dead     2
+step  12400  mse   60.904  L0     30.0  EV  0.864  dead     2
+step  12500  mse   60.998  L0     30.0  EV  0.864  dead     2
+step  12600  mse   60.746  L0     30.0  EV  0.864  dead     2
+step  12700  mse   61.716  L0     30.0  EV  0.861  dead     2
+step  12800  mse   60.048  L0     30.0  EV  0.866  dead     2
+step  12900  mse   61.968  L0     30.0  EV  0.862  dead     3
+step  13000  mse   62.001  L0     30.0  EV  0.861  dead     3
+step  13100  mse   62.001  L0     30.0  EV  0.861  dead     2
+step  13200  mse   62.056  L0     30.0  EV  0.862  dead     2
+step  13300  mse   60.412  L0     30.0  EV  0.864  dead     2
+step  13400  mse   61.689  L0     30.0  EV  0.862  dead     2
+step  13500  mse   60.161  L0     30.0  EV  0.865  dead     2
+step  13600  mse   61.036  L0     30.0  EV  0.863  dead     2
+step  13700  mse   60.676  L0     30.0  EV  0.864  dead     2
+step  13800  mse   61.047  L0     30.0  EV  0.863  dead     2
+step  13900  mse   60.530  L0     30.0  EV  0.864  dead     2
+step  14000  mse   60.914  L0     30.0  EV  0.863  dead     2
+step  14100  mse   61.886  L0     30.0  EV  0.862  dead     2
+step  14200  mse   61.299  L0     30.0  EV  0.863  dead     2
+step  14300  mse   59.795  L0     30.0  EV  0.866  dead     2
+step  14400  mse   61.039  L0     30.0  EV  0.864  dead     3
+step  14500  mse   60.901  L0     30.0  EV  0.865  dead     3
+step  14600  mse   62.780  L0     30.0  EV  0.860  dead     3
+step  14700  mse   60.343  L0     30.0  EV  0.864  dead     3
+step  14800  mse   61.370  L0     30.0  EV  0.863  dead     3
+step  14900  mse   61.033  L0     30.0  EV  0.863  dead     2
+step  14999  mse   59.253  L0     30.0  EV  0.867  dead     2  LR 0.927
+
+saved -> C:\Projects\sae-feature-reproducibility\checkpoints\full\arm_b_seed0  (1072s)
+--> arm_b_seed0 done in 17.9 min -> C:\Projects\sae-feature-reproducibility\checkpoints\full\arm_b_seed0
+
+=== run 7/10  arm_b_seed1  seed=1  data_seed=None ===
+run=arm_b_seed1  device=cuda
+seed=1  data_seed=1  (follows seed)
+rows=12,700,000  d_sae=12288  steps=15,000  epochs=4.8
+topk=30 (L1 disabled)  norm_scale=0.268445 (from manifest)
+decoder grad projection: ON
+Loading weights:   0%|          | 0/148 [00:00<?, ?it/s]Loading weights: 100%|##########| 148/148 [00:00<00:00, 8176.46it/s]
+Loaded pretrained model gpt2-small into HookedTransformer
+step      0  mse  339.434  L0     30.0  EV  0.240  dead     0  LR 0.386
+throughput (first 100 steps): 99,530 samples/s -> ~10.3 min projected
+step    100  mse  211.052  L0     30.0  EV  0.530  dead     0
+step    200  mse  171.377  L0     30.0  EV  0.617  dead     0
+step    300  mse  147.946  L0     30.0  EV  0.669  dead     0
+step    400  mse  135.614  L0     30.0  EV  0.697  dead     0
+step    500  mse  123.294  L0     30.0  EV  0.723  dead     0
+step    600  mse  113.889  L0     30.0  EV  0.745  dead     0
+step    700  mse  108.238  L0     30.0  EV  0.758  dead     0
+step    800  mse  101.872  L0     30.0  EV  0.772  dead     0
+step    900  mse   98.718  L0     30.0  EV  0.780  dead     0
+step   1000  mse   95.054  L0     30.0  EV  0.788  dead     0
+step   1100  mse   92.518  L0     30.0  EV  0.793  dead     0
+step   1200  mse   90.183  L0     30.0  EV  0.798  dead     0
+step   1300  mse   88.055  L0     30.0  EV  0.804  dead     0
+step   1400  mse   87.059  L0     30.0  EV  0.806  dead     0
+step   1500  mse   83.220  L0     30.0  EV  0.814  dead     0
+step   1600  mse   83.485  L0     30.0  EV  0.814  dead     0
+step   1700  mse   81.364  L0     30.0  EV  0.819  dead     0
+step   1800  mse   80.630  L0     30.0  EV  0.820  dead     0
+step   1900  mse   78.435  L0     30.0  EV  0.824  dead     0
+step   2000  mse   78.145  L0     30.0  EV  0.826  dead     0
+step   2100  mse   77.653  L0     30.0  EV  0.827  dead     0
+step   2200  mse   75.408  L0     30.0  EV  0.830  dead     0
+step   2300  mse   75.485  L0     30.0  EV  0.831  dead     0
+step   2400  mse   74.612  L0     30.0  EV  0.832  dead     0
+step   2500  mse   74.438  L0     30.0  EV  0.833  dead     0
+step   2600  mse   72.650  L0     30.0  EV  0.838  dead     0
+step   2700  mse   72.751  L0     30.0  EV  0.837  dead     0
+step   2800  mse   71.430  L0     30.0  EV  0.840  dead     0
+step   2900  mse   71.226  L0     30.0  EV  0.840  dead     0
+step   3000  mse   71.116  L0     30.0  EV  0.841  dead     0
+step   3100  mse   70.280  L0     30.0  EV  0.843  dead     0
+step   3200  mse   70.094  L0     30.0  EV  0.845  dead     0
+step   3300  mse   69.292  L0     30.0  EV  0.844  dead     0
+step   3400  mse   69.599  L0     30.0  EV  0.844  dead     0
+step   3500  mse   69.021  L0     30.0  EV  0.847  dead     0
+step   3600  mse   67.878  L0     30.0  EV  0.848  dead     0
+step   3700  mse   69.703  L0     30.0  EV  0.845  dead     0
+step   3800  mse   69.120  L0     30.0  EV  0.846  dead     0
+step   3900  mse   69.053  L0     30.0  EV  0.847  dead     0
+step   4000  mse   67.462  L0     30.0  EV  0.849  dead     0
+step   4100  mse   68.551  L0     30.0  EV  0.847  dead     0
+step   4200  mse   66.198  L0     30.0  EV  0.852  dead     0
+step   4300  mse   67.652  L0     30.0  EV  0.848  dead     0
+step   4400  mse   67.367  L0     30.0  EV  0.850  dead     0
+step   4500  mse   64.822  L0     30.0  EV  0.854  dead     0
+step   4600  mse   66.438  L0     30.0  EV  0.851  dead     0
+step   4700  mse   65.540  L0     30.0  EV  0.855  dead     0
+step   4800  mse   66.407  L0     30.0  EV  0.852  dead     0
+step   4900  mse   66.416  L0     30.0  EV  0.852  dead     0
+step   5000  mse   64.960  L0     30.0  EV  0.854  dead     0  LR 0.926
+step   5100  mse   64.846  L0     30.0  EV  0.855  dead     0
+step   5200  mse   66.285  L0     30.0  EV  0.852  dead     0
+step   5300  mse   65.196  L0     30.0  EV  0.853  dead     0
+step   5400  mse   65.886  L0     30.0  EV  0.853  dead     0
+step   5500  mse   65.701  L0     30.0  EV  0.854  dead     0
+step   5600  mse   64.594  L0     30.0  EV  0.856  dead     0
+step   5700  mse   64.361  L0     30.0  EV  0.856  dead     0
+step   5800  mse   64.268  L0     30.0  EV  0.857  dead     0
+step   5900  mse   64.222  L0     30.0  EV  0.857  dead     0
+step   6000  mse   64.246  L0     30.0  EV  0.857  dead     0
+step   6100  mse   63.779  L0     30.0  EV  0.857  dead     0
+step   6200  mse   63.633  L0     30.0  EV  0.858  dead     0
+step   6300  mse   64.288  L0     30.0  EV  0.856  dead     0
+step   6400  mse   63.166  L0     30.0  EV  0.858  dead     0
+step   6500  mse   64.732  L0     30.0  EV  0.856  dead     0
+step   6600  mse   63.876  L0     30.0  EV  0.857  dead     0
+step   6700  mse   62.711  L0     30.0  EV  0.860  dead     0
+step   6800  mse   63.196  L0     30.0  EV  0.858  dead     0
+step   6900  mse   63.476  L0     30.0  EV  0.858  dead     0
+step   7000  mse   62.863  L0     30.0  EV  0.859  dead     0
+step   7100  mse   63.126  L0     30.0  EV  0.859  dead     0
+step   7200  mse   62.959  L0     30.0  EV  0.859  dead     0
+step   7300  mse   63.071  L0     30.0  EV  0.858  dead     0
+step   7400  mse   62.169  L0     30.0  EV  0.861  dead     0
+step   7500  mse   62.433  L0     30.0  EV  0.860  dead     0
+step   7600  mse   63.432  L0     30.0  EV  0.858  dead     0
+step   7700  mse   63.476  L0     30.0  EV  0.858  dead     0
+step   7800  mse   62.366  L0     30.0  EV  0.860  dead     0
+step   7900  mse   62.188  L0     30.0  EV  0.861  dead     0
+step   8000  mse   62.146  L0     30.0  EV  0.861  dead     0
+step   8100  mse   62.865  L0     30.0  EV  0.860  dead     0
+step   8200  mse   62.477  L0     30.0  EV  0.861  dead     0
+step   8300  mse   62.770  L0     30.0  EV  0.860  dead     0
+step   8400  mse   63.472  L0     30.0  EV  0.859  dead     0
+step   8500  mse   63.199  L0     30.0  EV  0.859  dead     0
+step   8600  mse   62.763  L0     30.0  EV  0.860  dead     0
+step   8700  mse   61.609  L0     30.0  EV  0.862  dead     0
+step   8800  mse   61.499  L0     30.0  EV  0.863  dead     0
+step   8900  mse   61.878  L0     30.0  EV  0.862  dead     0
+step   9000  mse   63.134  L0     30.0  EV  0.859  dead     0
+step   9100  mse   62.318  L0     30.0  EV  0.861  dead     1
+step   9200  mse   61.646  L0     30.0  EV  0.863  dead     0
+step   9300  mse   61.933  L0     30.0  EV  0.862  dead     0
+step   9400  mse   62.569  L0     30.0  EV  0.861  dead     0
+step   9500  mse   61.682  L0     30.0  EV  0.862  dead     0
+step   9600  mse   62.771  L0     30.0  EV  0.860  dead     0
+step   9700  mse   62.835  L0     30.0  EV  0.860  dead     1
+step   9800  mse   61.759  L0     30.0  EV  0.862  dead     1
+step   9900  mse   62.334  L0     30.0  EV  0.861  dead     1
+step  10000  mse   62.247  L0     30.0  EV  0.861  dead     1  LR 0.918
+step  10100  mse   61.592  L0     30.0  EV  0.862  dead     1
+step  10200  mse   61.791  L0     30.0  EV  0.861  dead     1
+step  10300  mse   62.186  L0     30.0  EV  0.861  dead     1
+step  10400  mse   61.954  L0     30.0  EV  0.861  dead     0
+step  10500  mse   61.466  L0     30.0  EV  0.863  dead     0
+step  10600  mse   62.123  L0     30.0  EV  0.861  dead     0
+step  10700  mse   61.498  L0     30.0  EV  0.862  dead     0
+step  10800  mse   60.314  L0     30.0  EV  0.865  dead     0
+step  10900  mse   61.708  L0     30.0  EV  0.862  dead     1
+step  11000  mse   61.193  L0     30.0  EV  0.863  dead     1
+step  11100  mse   61.544  L0     30.0  EV  0.862  dead     1
+step  11200  mse   60.573  L0     30.0  EV  0.864  dead     1
+step  11300  mse   60.399  L0     30.0  EV  0.865  dead     1
+step  11400  mse   61.477  L0     30.0  EV  0.862  dead     1
+step  11500  mse   61.738  L0     30.0  EV  0.863  dead     1
+step  11600  mse   61.157  L0     30.0  EV  0.864  dead     1
+step  11700  mse   61.501  L0     30.0  EV  0.863  dead     1
+step  11800  mse   61.745  L0     30.0  EV  0.862  dead     1
+step  11900  mse   61.107  L0     30.0  EV  0.864  dead     1
+step  12000  mse   61.423  L0     30.0  EV  0.863  dead     0
+step  12100  mse   61.336  L0     30.0  EV  0.863  dead     0
+step  12200  mse   61.055  L0     30.0  EV  0.863  dead     0
+step  12300  mse   61.584  L0     30.0  EV  0.863  dead     1
+step  12400  mse   61.773  L0     30.0  EV  0.862  dead     2
+step  12500  mse   61.664  L0     30.0  EV  0.862  dead     2
+step  12600  mse   60.709  L0     30.0  EV  0.863  dead     2
+step  12700  mse   61.611  L0     30.0  EV  0.863  dead     4
+step  12800  mse   60.280  L0     30.0  EV  0.864  dead     3
+step  12900  mse   61.789  L0     30.0  EV  0.862  dead     3
+step  13000  mse   60.131  L0     30.0  EV  0.866  dead     3
+step  13100  mse   61.338  L0     30.0  EV  0.863  dead     3
+step  13200  mse   60.417  L0     30.0  EV  0.865  dead     3
+step  13300  mse   60.993  L0     30.0  EV  0.864  dead     3
+step  13400  mse   60.824  L0     30.0  EV  0.862  dead     3
+step  13500  mse   60.756  L0     30.0  EV  0.865  dead     3
+step  13600  mse   61.061  L0     30.0  EV  0.863  dead     2
+step  13700  mse   61.692  L0     30.0  EV  0.862  dead     1
+step  13800  mse   60.331  L0     30.0  EV  0.864  dead     2
+step  13900  mse   60.083  L0     30.0  EV  0.865  dead     2
+step  14000  mse   60.157  L0     30.0  EV  0.865  dead     2
+step  14100  mse   60.210  L0     30.0  EV  0.865  dead     2
+step  14200  mse   60.686  L0     30.0  EV  0.864  dead     2
+step  14300  mse   60.374  L0     30.0  EV  0.865  dead     2
+step  14400  mse   62.196  L0     30.0  EV  0.861  dead     3
+step  14500  mse   60.527  L0     30.0  EV  0.865  dead     4
+step  14600  mse   61.360  L0     30.0  EV  0.862  dead     4
+step  14700  mse   60.670  L0     30.0  EV  0.865  dead     4
+step  14800  mse   59.832  L0     30.0  EV  0.866  dead     4
+step  14900  mse   59.794  L0     30.0  EV  0.865  dead     4
+step  14999  mse   60.881  L0     30.0  EV  0.864  dead     4  LR 0.921
+
+saved -> C:\Projects\sae-feature-reproducibility\checkpoints\full\arm_b_seed1  (1062s)
+--> arm_b_seed1 done in 17.8 min -> C:\Projects\sae-feature-reproducibility\checkpoints\full\arm_b_seed1
+
+=== run 8/10  arm_b_seed2  seed=2  data_seed=None ===
+run=arm_b_seed2  device=cuda
+seed=2  data_seed=2  (follows seed)
+rows=12,700,000  d_sae=12288  steps=15,000  epochs=4.8
+topk=30 (L1 disabled)  norm_scale=0.268445 (from manifest)
+decoder grad projection: ON
+Loading weights:   0%|          | 0/148 [00:00<?, ?it/s]Loading weights: 100%|##########| 148/148 [00:00<00:00, 7544.54it/s]
+Loaded pretrained model gpt2-small into HookedTransformer
+step      0  mse  339.094  L0     30.0  EV  0.240  dead     0  LR 0.492
+throughput (first 100 steps): 97,001 samples/s -> ~10.6 min projected
+step    100  mse  210.046  L0     30.0  EV  0.530  dead     0
+step    200  mse  168.924  L0     30.0  EV  0.621  dead     0
+step    300  mse  148.973  L0     30.0  EV  0.667  dead     0
+step    400  mse  132.987  L0     30.0  EV  0.704  dead     0
+step    500  mse  122.033  L0     30.0  EV  0.726  dead     0
+step    600  mse  111.879  L0     30.0  EV  0.748  dead     0
+step    700  mse  108.526  L0     30.0  EV  0.760  dead     0
+step    800  mse  104.290  L0     30.0  EV  0.767  dead     0
+step    900  mse   98.106  L0     30.0  EV  0.779  dead     0
+step   1000  mse   95.448  L0     30.0  EV  0.787  dead     0
+step   1100  mse   92.531  L0     30.0  EV  0.793  dead     0
+step   1200  mse   88.019  L0     30.0  EV  0.803  dead     0
+step   1300  mse   86.702  L0     30.0  EV  0.806  dead     0
+step   1400  mse   85.884  L0     30.0  EV  0.808  dead     0
+step   1500  mse   84.444  L0     30.0  EV  0.811  dead     0
+step   1600  mse   82.659  L0     30.0  EV  0.815  dead     0
+step   1700  mse   82.269  L0     30.0  EV  0.817  dead     0
+step   1800  mse   80.711  L0     30.0  EV  0.820  dead     0
+step   1900  mse   78.552  L0     30.0  EV  0.824  dead     0
+step   2000  mse   77.762  L0     30.0  EV  0.827  dead     0
+step   2100  mse   76.504  L0     30.0  EV  0.828  dead     0
+step   2200  mse   76.201  L0     30.0  EV  0.830  dead     0
+step   2300  mse   75.559  L0     30.0  EV  0.832  dead     0
+step   2400  mse   74.498  L0     30.0  EV  0.834  dead     0
+step   2500  mse   73.540  L0     30.0  EV  0.835  dead     0
+step   2600  mse   72.698  L0     30.0  EV  0.838  dead     0
+step   2700  mse   72.173  L0     30.0  EV  0.839  dead     0
+step   2800  mse   71.935  L0     30.0  EV  0.838  dead     0
+step   2900  mse   70.990  L0     30.0  EV  0.842  dead     0
+step   3000  mse   70.958  L0     30.0  EV  0.842  dead     0
+step   3100  mse   69.907  L0     30.0  EV  0.843  dead     0
+step   3200  mse   70.460  L0     30.0  EV  0.841  dead     0
+step   3300  mse   69.521  L0     30.0  EV  0.844  dead     0
+step   3400  mse   70.146  L0     30.0  EV  0.844  dead     0
+step   3500  mse   68.762  L0     30.0  EV  0.846  dead     0
+step   3600  mse   68.637  L0     30.0  EV  0.846  dead     0
+step   3700  mse   68.982  L0     30.0  EV  0.845  dead     0
+step   3800  mse   67.081  L0     30.0  EV  0.850  dead     0
+step   3900  mse   68.376  L0     30.0  EV  0.848  dead     0
+step   4000  mse   67.809  L0     30.0  EV  0.848  dead     0
+step   4100  mse   66.907  L0     30.0  EV  0.850  dead     0
+step   4200  mse   66.533  L0     30.0  EV  0.852  dead     0
+step   4300  mse   66.270  L0     30.0  EV  0.852  dead     0
+step   4400  mse   65.917  L0     30.0  EV  0.852  dead     0
+step   4500  mse   67.061  L0     30.0  EV  0.851  dead     0
+step   4600  mse   66.182  L0     30.0  EV  0.852  dead     0
+step   4700  mse   66.791  L0     30.0  EV  0.850  dead     0
+step   4800  mse   66.043  L0     30.0  EV  0.852  dead     0
+step   4900  mse   66.688  L0     30.0  EV  0.851  dead     0
+step   5000  mse   64.997  L0     30.0  EV  0.855  dead     0  LR 0.930
+step   5100  mse   64.864  L0     30.0  EV  0.856  dead     0
+step   5200  mse   64.330  L0     30.0  EV  0.854  dead     0
+step   5300  mse   66.436  L0     30.0  EV  0.851  dead     0
+step   5400  mse   65.452  L0     30.0  EV  0.853  dead     0
+step   5500  mse   65.697  L0     30.0  EV  0.853  dead     0
+step   5600  mse   64.715  L0     30.0  EV  0.855  dead     0
+step   5700  mse   64.427  L0     30.0  EV  0.856  dead     0
+step   5800  mse   64.455  L0     30.0  EV  0.856  dead     0
+step   5900  mse   64.578  L0     30.0  EV  0.856  dead     0
+step   6000  mse   64.753  L0     30.0  EV  0.855  dead     0
+step   6100  mse   64.734  L0     30.0  EV  0.856  dead     1
+step   6200  mse   64.836  L0     30.0  EV  0.856  dead     1
+step   6300  mse   64.466  L0     30.0  EV  0.857  dead     1
+step   6400  mse   63.843  L0     30.0  EV  0.858  dead     0
+step   6500  mse   63.626  L0     30.0  EV  0.858  dead     0
+step   6600  mse   63.797  L0     30.0  EV  0.858  dead     0
+step   6700  mse   64.118  L0     30.0  EV  0.857  dead     0
+step   6800  mse   63.784  L0     30.0  EV  0.857  dead     0
+step   6900  mse   64.556  L0     30.0  EV  0.856  dead     0
+step   7000  mse   64.744  L0     30.0  EV  0.855  dead     0
+step   7100  mse   62.445  L0     30.0  EV  0.860  dead     0
+step   7200  mse   62.811  L0     30.0  EV  0.860  dead     0
+step   7300  mse   63.411  L0     30.0  EV  0.859  dead     0
+step   7400  mse   62.958  L0     30.0  EV  0.859  dead     0
+step   7500  mse   62.306  L0     30.0  EV  0.861  dead     0
+step   7600  mse   62.821  L0     30.0  EV  0.859  dead     0
+step   7700  mse   63.475  L0     30.0  EV  0.858  dead     0
+step   7800  mse   63.022  L0     30.0  EV  0.860  dead     0
+step   7900  mse   62.212  L0     30.0  EV  0.860  dead     0
+step   8000  mse   63.029  L0     30.0  EV  0.859  dead     0
+step   8100  mse   62.916  L0     30.0  EV  0.860  dead     0
+step   8200  mse   61.751  L0     30.0  EV  0.861  dead     0
+step   8300  mse   62.808  L0     30.0  EV  0.861  dead     0
+step   8400  mse   62.238  L0     30.0  EV  0.861  dead     0
+step   8500  mse   62.855  L0     30.0  EV  0.860  dead     0
+step   8600  mse   62.057  L0     30.0  EV  0.860  dead     0
+step   8700  mse   62.531  L0     30.0  EV  0.861  dead     0
+step   8800  mse   61.138  L0     30.0  EV  0.862  dead     0
+step   8900  mse   62.500  L0     30.0  EV  0.860  dead     0
+step   9000  mse   63.703  L0     30.0  EV  0.858  dead     0
+step   9100  mse   62.438  L0     30.0  EV  0.861  dead     0
+step   9200  mse   61.647  L0     30.0  EV  0.862  dead     0
+step   9300  mse   61.806  L0     30.0  EV  0.860  dead     1
+step   9400  mse   62.043  L0     30.0  EV  0.861  dead     1
+step   9500  mse   62.001  L0     30.0  EV  0.862  dead     1
+step   9600  mse   61.694  L0     30.0  EV  0.861  dead     1
+step   9700  mse   61.986  L0     30.0  EV  0.862  dead     1
+step   9800  mse   62.743  L0     30.0  EV  0.859  dead     0
+step   9900  mse   61.442  L0     30.0  EV  0.863  dead     0
+step  10000  mse   61.944  L0     30.0  EV  0.861  dead     1  LR 0.926
+step  10100  mse   62.298  L0     30.0  EV  0.860  dead     2
+step  10200  mse   62.682  L0     30.0  EV  0.860  dead     3
+step  10300  mse   61.846  L0     30.0  EV  0.862  dead     4
+step  10400  mse   61.706  L0     30.0  EV  0.862  dead     4
+step  10500  mse   61.541  L0     30.0  EV  0.863  dead     4
+step  10600  mse   61.737  L0     30.0  EV  0.863  dead     4
+step  10700  mse   62.386  L0     30.0  EV  0.860  dead     3
+step  10800  mse   61.105  L0     30.0  EV  0.863  dead     3
+step  10900  mse   61.186  L0     30.0  EV  0.862  dead     3
+step  11000  mse   61.689  L0     30.0  EV  0.862  dead     2
+step  11100  mse   61.834  L0     30.0  EV  0.862  dead     3
+step  11200  mse   60.421  L0     30.0  EV  0.865  dead     2
+step  11300  mse   61.739  L0     30.0  EV  0.862  dead     2
+step  11400  mse   61.633  L0     30.0  EV  0.862  dead     2
+step  11500  mse   60.818  L0     30.0  EV  0.864  dead     2
+step  11600  mse   62.022  L0     30.0  EV  0.861  dead     2
+step  11700  mse   61.067  L0     30.0  EV  0.864  dead     2
+step  11800  mse   62.301  L0     30.0  EV  0.861  dead     2
+step  11900  mse   61.224  L0     30.0  EV  0.864  dead     2
+step  12000  mse   61.730  L0     30.0  EV  0.862  dead     2
+step  12100  mse   61.129  L0     30.0  EV  0.863  dead     2
+step  12200  mse   61.672  L0     30.0  EV  0.862  dead     2
+step  12300  mse   61.330  L0     30.0  EV  0.863  dead     2
+step  12400  mse   61.070  L0     30.0  EV  0.863  dead     1
+step  12500  mse   61.502  L0     30.0  EV  0.863  dead     1
+step  12600  mse   60.912  L0     30.0  EV  0.864  dead     1
+step  12700  mse   60.620  L0     30.0  EV  0.865  dead     1
+step  12800  mse   60.232  L0     30.0  EV  0.865  dead     1
+step  12900  mse   60.379  L0     30.0  EV  0.865  dead     1
+step  13000  mse   60.880  L0     30.0  EV  0.864  dead     2
+step  13100  mse   61.665  L0     30.0  EV  0.863  dead     2
+step  13200  mse   60.589  L0     30.0  EV  0.864  dead     3
+step  13300  mse   61.293  L0     30.0  EV  0.863  dead     3
+step  13400  mse   60.358  L0     30.0  EV  0.865  dead     3
+step  13500  mse   60.808  L0     30.0  EV  0.864  dead     3
+step  13600  mse   61.410  L0     30.0  EV  0.862  dead     3
+step  13700  mse   61.023  L0     30.0  EV  0.863  dead     3
+step  13800  mse   61.432  L0     30.0  EV  0.863  dead     4
+step  13900  mse   61.087  L0     30.0  EV  0.864  dead     4
+step  14000  mse   61.130  L0     30.0  EV  0.863  dead     4
+step  14100  mse   61.088  L0     30.0  EV  0.864  dead     3
+step  14200  mse   61.041  L0     30.0  EV  0.863  dead     3
+step  14300  mse   61.429  L0     30.0  EV  0.863  dead     3
+step  14400  mse   62.045  L0     30.0  EV  0.862  dead     3
+step  14500  mse   61.194  L0     30.0  EV  0.864  dead     3
+step  14600  mse   60.143  L0     30.0  EV  0.866  dead     3
+step  14700  mse   60.727  L0     30.0  EV  0.865  dead     3
+step  14800  mse   60.034  L0     30.0  EV  0.866  dead     4
+step  14900  mse   61.151  L0     30.0  EV  0.864  dead     3
+step  14999  mse   61.239  L0     30.0  EV  0.864  dead     3  LR 0.922
+
+saved -> C:\Projects\sae-feature-reproducibility\checkpoints\full\arm_b_seed2  (1057s)
+--> arm_b_seed2 done in 17.8 min -> C:\Projects\sae-feature-reproducibility\checkpoints\full\arm_b_seed2
+
+=== run 9/10  arm_b_seed3  seed=3  data_seed=None ===
+run=arm_b_seed3  device=cuda
+seed=3  data_seed=3  (follows seed)
+rows=12,700,000  d_sae=12288  steps=15,000  epochs=4.8
+topk=30 (L1 disabled)  norm_scale=0.268445 (from manifest)
+decoder grad projection: ON
+Loading weights:   0%|          | 0/148 [00:00<?, ?it/s]Loading weights: 100%|##########| 148/148 [00:00<00:00, 7472.25it/s]
+Loaded pretrained model gpt2-small into HookedTransformer
+step      0  mse  340.077  L0     30.0  EV  0.240  dead     0  LR 0.433
+throughput (first 100 steps): 101,464 samples/s -> ~10.1 min projected
+step    100  mse  213.135  L0     30.0  EV  0.524  dead     0
+step    200  mse  169.141  L0     30.0  EV  0.621  dead     0
+step    300  mse  147.354  L0     30.0  EV  0.671  dead     0
+step    400  mse  133.095  L0     30.0  EV  0.702  dead     0
+step    500  mse  122.802  L0     30.0  EV  0.725  dead     0
+step    600  mse  113.936  L0     30.0  EV  0.745  dead     0
+step    700  mse  108.668  L0     30.0  EV  0.758  dead     0
+step    800  mse  102.387  L0     30.0  EV  0.771  dead     0
+step    900  mse   99.143  L0     30.0  EV  0.778  dead     0
+step   1000  mse   95.236  L0     30.0  EV  0.786  dead     0
+step   1100  mse   91.862  L0     30.0  EV  0.795  dead     0
+step   1200  mse   89.692  L0     30.0  EV  0.799  dead     0
+step   1300  mse   87.174  L0     30.0  EV  0.806  dead     0
+step   1400  mse   85.896  L0     30.0  EV  0.808  dead     0
+step   1500  mse   84.886  L0     30.0  EV  0.811  dead     0
+step   1600  mse   82.474  L0     30.0  EV  0.816  dead     0
+step   1700  mse   80.549  L0     30.0  EV  0.819  dead     0
+step   1800  mse   79.035  L0     30.0  EV  0.822  dead     0
+step   1900  mse   79.731  L0     30.0  EV  0.823  dead     0
+step   2000  mse   78.033  L0     30.0  EV  0.826  dead     0
+step   2100  mse   77.297  L0     30.0  EV  0.828  dead     0
+step   2200  mse   76.298  L0     30.0  EV  0.831  dead     0
+step   2300  mse   76.272  L0     30.0  EV  0.830  dead     0
+step   2400  mse   75.198  L0     30.0  EV  0.833  dead     0
+step   2500  mse   73.045  L0     30.0  EV  0.835  dead     0
+step   2600  mse   73.993  L0     30.0  EV  0.835  dead     0
+step   2700  mse   72.702  L0     30.0  EV  0.837  dead     0
+step   2800  mse   71.324  L0     30.0  EV  0.839  dead     0
+step   2900  mse   72.379  L0     30.0  EV  0.838  dead     0
+step   3000  mse   70.512  L0     30.0  EV  0.842  dead     0
+step   3100  mse   72.640  L0     30.0  EV  0.838  dead     0
+step   3200  mse   69.453  L0     30.0  EV  0.844  dead     0
+step   3300  mse   72.305  L0     30.0  EV  0.839  dead     0
+step   3400  mse   69.704  L0     30.0  EV  0.844  dead     0
+step   3500  mse   69.280  L0     30.0  EV  0.846  dead     0
+step   3600  mse   67.168  L0     30.0  EV  0.849  dead     0
+step   3700  mse   68.218  L0     30.0  EV  0.848  dead     0
+step   3800  mse   68.676  L0     30.0  EV  0.847  dead     0
+step   3900  mse   67.525  L0     30.0  EV  0.849  dead     0
+step   4000  mse   67.914  L0     30.0  EV  0.849  dead     0
+step   4100  mse   66.863  L0     30.0  EV  0.850  dead     0
+step   4200  mse   66.272  L0     30.0  EV  0.851  dead     0
+step   4300  mse   67.018  L0     30.0  EV  0.850  dead     0
+step   4400  mse   66.402  L0     30.0  EV  0.851  dead     0
+step   4500  mse   66.785  L0     30.0  EV  0.851  dead     0
+step   4600  mse   66.625  L0     30.0  EV  0.851  dead     0
+step   4700  mse   65.856  L0     30.0  EV  0.853  dead     0
+step   4800  mse   65.679  L0     30.0  EV  0.853  dead     0
+step   4900  mse   65.010  L0     30.0  EV  0.855  dead     0
+step   5000  mse   65.812  L0     30.0  EV  0.853  dead     0  LR 0.924
+step   5100  mse   65.042  L0     30.0  EV  0.855  dead     0
+step   5200  mse   64.891  L0     30.0  EV  0.855  dead     0
+step   5300  mse   65.301  L0     30.0  EV  0.854  dead     0
+step   5400  mse   65.703  L0     30.0  EV  0.854  dead     0
+step   5500  mse   64.539  L0     30.0  EV  0.856  dead     0
+step   5600  mse   64.645  L0     30.0  EV  0.855  dead     0
+step   5700  mse   64.101  L0     30.0  EV  0.857  dead     0
+step   5800  mse   64.892  L0     30.0  EV  0.856  dead     0
+step   5900  mse   63.379  L0     30.0  EV  0.857  dead     0
+step   6000  mse   63.431  L0     30.0  EV  0.859  dead     0
+step   6100  mse   64.134  L0     30.0  EV  0.856  dead     0
+step   6200  mse   64.294  L0     30.0  EV  0.857  dead     0
+step   6300  mse   65.186  L0     30.0  EV  0.856  dead     0
+step   6400  mse   63.264  L0     30.0  EV  0.858  dead     0
+step   6500  mse   62.385  L0     30.0  EV  0.860  dead     0
+step   6600  mse   63.807  L0     30.0  EV  0.859  dead     0
+step   6700  mse   64.993  L0     30.0  EV  0.855  dead     0
+step   6800  mse   64.135  L0     30.0  EV  0.857  dead     0
+step   6900  mse   63.444  L0     30.0  EV  0.858  dead     1
+step   7000  mse   62.994  L0     30.0  EV  0.859  dead     1
+step   7100  mse   62.471  L0     30.0  EV  0.860  dead     1
+step   7200  mse   63.585  L0     30.0  EV  0.858  dead     1
+step   7300  mse   63.113  L0     30.0  EV  0.860  dead     1
+step   7400  mse   63.718  L0     30.0  EV  0.858  dead     1
+step   7500  mse   63.082  L0     30.0  EV  0.859  dead     1
+step   7600  mse   63.532  L0     30.0  EV  0.858  dead     1
+step   7700  mse   63.580  L0     30.0  EV  0.858  dead     1
+step   7800  mse   62.421  L0     30.0  EV  0.860  dead     1
+step   7900  mse   62.563  L0     30.0  EV  0.860  dead     1
+step   8000  mse   62.716  L0     30.0  EV  0.860  dead     1
+step   8100  mse   62.708  L0     30.0  EV  0.860  dead     1
+step   8200  mse   62.421  L0     30.0  EV  0.860  dead     1
+step   8300  mse   62.800  L0     30.0  EV  0.860  dead     1
+step   8400  mse   63.230  L0     30.0  EV  0.858  dead     2
+step   8500  mse   63.353  L0     30.0  EV  0.859  dead     1
+step   8600  mse   62.839  L0     30.0  EV  0.860  dead     1
+step   8700  mse   62.879  L0     30.0  EV  0.860  dead     1
+step   8800  mse   61.880  L0     30.0  EV  0.862  dead     2
+step   8900  mse   63.255  L0     30.0  EV  0.859  dead     3
+step   9000  mse   62.777  L0     30.0  EV  0.860  dead     3
+step   9100  mse   63.012  L0     30.0  EV  0.859  dead     2
+step   9200  mse   62.964  L0     30.0  EV  0.859  dead     2
+step   9300  mse   63.402  L0     30.0  EV  0.859  dead     2
+step   9400  mse   61.977  L0     30.0  EV  0.862  dead     4
+step   9500  mse   62.338  L0     30.0  EV  0.861  dead     3
+step   9600  mse   60.719  L0     30.0  EV  0.864  dead     3
+step   9700  mse   62.380  L0     30.0  EV  0.861  dead     2
+step   9800  mse   62.284  L0     30.0  EV  0.861  dead     2
+step   9900  mse   63.168  L0     30.0  EV  0.859  dead     2
+step  10000  mse   61.428  L0     30.0  EV  0.862  dead     2  LR 0.924
+step  10100  mse   62.275  L0     30.0  EV  0.861  dead     1
+step  10200  mse   61.608  L0     30.0  EV  0.862  dead     1
+step  10300  mse   61.355  L0     30.0  EV  0.862  dead     1
+step  10400  mse   61.607  L0     30.0  EV  0.862  dead     1
+step  10500  mse   62.215  L0     30.0  EV  0.861  dead     1
+step  10600  mse   61.784  L0     30.0  EV  0.862  dead     1
+step  10700  mse   60.726  L0     30.0  EV  0.864  dead     1
+step  10800  mse   61.623  L0     30.0  EV  0.862  dead     1
+step  10900  mse   62.409  L0     30.0  EV  0.861  dead     1
+step  11000  mse   61.618  L0     30.0  EV  0.861  dead     1
+step  11100  mse   61.276  L0     30.0  EV  0.863  dead     1
+step  11200  mse   61.331  L0     30.0  EV  0.862  dead     1
+step  11300  mse   61.582  L0     30.0  EV  0.862  dead     1
+step  11400  mse   62.043  L0     30.0  EV  0.862  dead     1
+step  11500  mse   60.675  L0     30.0  EV  0.864  dead     1
+step  11600  mse   62.018  L0     30.0  EV  0.861  dead     2
+step  11700  mse   61.817  L0     30.0  EV  0.862  dead     2
+step  11800  mse   61.517  L0     30.0  EV  0.862  dead     2
+step  11900  mse   61.549  L0     30.0  EV  0.864  dead     2
+step  12000  mse   61.826  L0     30.0  EV  0.862  dead     2
+step  12100  mse   62.401  L0     30.0  EV  0.861  dead     3
+step  12200  mse   60.764  L0     30.0  EV  0.864  dead     3
+step  12300  mse   61.931  L0     30.0  EV  0.863  dead     3
+step  12400  mse   61.495  L0     30.0  EV  0.862  dead     3
+step  12500  mse   62.172  L0     30.0  EV  0.861  dead     3
+step  12600  mse   61.839  L0     30.0  EV  0.861  dead     3
+step  12700  mse   61.043  L0     30.0  EV  0.863  dead     3
+step  12800  mse   60.837  L0     30.0  EV  0.865  dead     3
+step  12900  mse   60.984  L0     30.0  EV  0.863  dead     3
+step  13000  mse   60.836  L0     30.0  EV  0.863  dead     3
+step  13100  mse   60.568  L0     30.0  EV  0.864  dead     3
+step  13200  mse   60.424  L0     30.0  EV  0.865  dead     2
+step  13300  mse   61.350  L0     30.0  EV  0.863  dead     4
+step  13400  mse   60.448  L0     30.0  EV  0.865  dead     4
+step  13500  mse   61.364  L0     30.0  EV  0.863  dead     4
+step  13600  mse   60.327  L0     30.0  EV  0.865  dead     4
+step  13700  mse   61.154  L0     30.0  EV  0.864  dead     4
+step  13800  mse   61.605  L0     30.0  EV  0.862  dead     4
+step  13900  mse   61.466  L0     30.0  EV  0.862  dead     4
+step  14000  mse   61.227  L0     30.0  EV  0.863  dead     3
+step  14100  mse   61.539  L0     30.0  EV  0.863  dead     3
+step  14200  mse   61.540  L0     30.0  EV  0.864  dead     3
+step  14300  mse   61.110  L0     30.0  EV  0.863  dead     3
+step  14400  mse   61.120  L0     30.0  EV  0.863  dead     3
+step  14500  mse   61.394  L0     30.0  EV  0.863  dead     3
+step  14600  mse   60.630  L0     30.0  EV  0.865  dead     3
+step  14700  mse   60.138  L0     30.0  EV  0.865  dead     3
+step  14800  mse   60.945  L0     30.0  EV  0.864  dead     3
+step  14900  mse   60.899  L0     30.0  EV  0.864  dead     3
+step  14999  mse   60.954  L0     30.0  EV  0.864  dead     3  LR 0.920
+
+saved -> C:\Projects\sae-feature-reproducibility\checkpoints\full\arm_b_seed3  (1055s)
+--> arm_b_seed3 done in 17.7 min -> C:\Projects\sae-feature-reproducibility\checkpoints\full\arm_b_seed3
+
+=== run 10/10  arm_b_seed4  seed=4  data_seed=None ===
+run=arm_b_seed4  device=cuda
+seed=4  data_seed=4  (follows seed)
+rows=12,700,000  d_sae=12288  steps=15,000  epochs=4.8
+topk=30 (L1 disabled)  norm_scale=0.268445 (from manifest)
+decoder grad projection: ON
+Loading weights:   0%|          | 0/148 [00:00<?, ?it/s]Loading weights: 100%|##########| 148/148 [00:00<00:00, 7874.43it/s]
+Loaded pretrained model gpt2-small into HookedTransformer
+step      0  mse  342.642  L0     30.0  EV  0.239  dead     0  LR 0.442
+throughput (first 100 steps): 99,373 samples/s -> ~10.3 min projected
+step    100  mse  210.975  L0     30.0  EV  0.528  dead     0
+step    200  mse  170.050  L0     30.0  EV  0.620  dead     0
+step    300  mse  148.408  L0     30.0  EV  0.670  dead     0
+step    400  mse  132.518  L0     30.0  EV  0.703  dead     0
+step    500  mse  122.483  L0     30.0  EV  0.725  dead     0
+step    600  mse  114.197  L0     30.0  EV  0.745  dead     0
+step    700  mse  108.277  L0     30.0  EV  0.758  dead     0
+step    800  mse  102.614  L0     30.0  EV  0.771  dead     0
+step    900  mse   98.464  L0     30.0  EV  0.779  dead     0
+step   1000  mse   94.933  L0     30.0  EV  0.788  dead     0
+step   1100  mse   91.945  L0     30.0  EV  0.796  dead     0
+step   1200  mse   89.058  L0     30.0  EV  0.800  dead     0
+step   1300  mse   89.612  L0     30.0  EV  0.799  dead     0
+step   1400  mse   85.054  L0     30.0  EV  0.810  dead     0
+step   1500  mse   82.621  L0     30.0  EV  0.814  dead     0
+step   1600  mse   82.079  L0     30.0  EV  0.817  dead     0
+step   1700  mse   79.901  L0     30.0  EV  0.820  dead     0
+step   1800  mse   79.374  L0     30.0  EV  0.822  dead     0
+step   1900  mse   79.734  L0     30.0  EV  0.822  dead     0
+step   2000  mse   78.181  L0     30.0  EV  0.825  dead     0
+step   2100  mse   76.954  L0     30.0  EV  0.828  dead     0
+step   2200  mse   76.320  L0     30.0  EV  0.829  dead     0
+step   2300  mse   75.745  L0     30.0  EV  0.831  dead     0
+step   2400  mse   74.100  L0     30.0  EV  0.835  dead     0
+step   2500  mse   73.665  L0     30.0  EV  0.835  dead     0
+step   2600  mse   74.995  L0     30.0  EV  0.834  dead     0
+step   2700  mse   71.470  L0     30.0  EV  0.840  dead     0
+step   2800  mse   72.226  L0     30.0  EV  0.839  dead     0
+step   2900  mse   71.863  L0     30.0  EV  0.839  dead     0
+step   3000  mse   71.252  L0     30.0  EV  0.841  dead     0
+step   3100  mse   70.681  L0     30.0  EV  0.841  dead     0
+step   3200  mse   68.458  L0     30.0  EV  0.846  dead     0
+step   3300  mse   68.640  L0     30.0  EV  0.846  dead     0
+step   3400  mse   70.057  L0     30.0  EV  0.843  dead     0
+step   3500  mse   68.610  L0     30.0  EV  0.846  dead     0
+step   3600  mse   69.529  L0     30.0  EV  0.845  dead     0
+step   3700  mse   68.902  L0     30.0  EV  0.844  dead     0
+step   3800  mse   68.782  L0     30.0  EV  0.847  dead     0
+step   3900  mse   68.448  L0     30.0  EV  0.848  dead     0
+step   4000  mse   66.628  L0     30.0  EV  0.849  dead     0
+step   4100  mse   66.148  L0     30.0  EV  0.852  dead     0
+step   4200  mse   67.156  L0     30.0  EV  0.849  dead     0
+step   4300  mse   67.126  L0     30.0  EV  0.850  dead     0
+step   4400  mse   66.662  L0     30.0  EV  0.852  dead     0
+step   4500  mse   66.275  L0     30.0  EV  0.852  dead     0
+step   4600  mse   64.854  L0     30.0  EV  0.854  dead     0
+step   4700  mse   67.028  L0     30.0  EV  0.851  dead     0
+step   4800  mse   66.222  L0     30.0  EV  0.852  dead     0
+step   4900  mse   65.638  L0     30.0  EV  0.853  dead     0
+step   5000  mse   65.296  L0     30.0  EV  0.855  dead     0  LR 0.932
+step   5100  mse   65.540  L0     30.0  EV  0.854  dead     0
+step   5200  mse   65.759  L0     30.0  EV  0.853  dead     0
+step   5300  mse   64.666  L0     30.0  EV  0.856  dead     0
+step   5400  mse   65.096  L0     30.0  EV  0.855  dead     0
+step   5500  mse   64.765  L0     30.0  EV  0.856  dead     0
+step   5600  mse   64.322  L0     30.0  EV  0.856  dead     0
+step   5700  mse   64.563  L0     30.0  EV  0.856  dead     0
+step   5800  mse   65.033  L0     30.0  EV  0.855  dead     0
+step   5900  mse   63.817  L0     30.0  EV  0.857  dead     0
+step   6000  mse   64.377  L0     30.0  EV  0.856  dead     0
+step   6100  mse   64.890  L0     30.0  EV  0.855  dead     0
+step   6200  mse   64.257  L0     30.0  EV  0.856  dead     0
+step   6300  mse   64.006  L0     30.0  EV  0.858  dead     0
+step   6400  mse   63.989  L0     30.0  EV  0.858  dead     0
+step   6500  mse   63.902  L0     30.0  EV  0.857  dead     0
+step   6600  mse   64.413  L0     30.0  EV  0.856  dead     0
+step   6700  mse   63.566  L0     30.0  EV  0.859  dead     0
+step   6800  mse   63.768  L0     30.0  EV  0.857  dead     1
+step   6900  mse   62.468  L0     30.0  EV  0.860  dead     1
+step   7000  mse   63.282  L0     30.0  EV  0.858  dead     1
+step   7100  mse   63.462  L0     30.0  EV  0.858  dead     1
+step   7200  mse   63.749  L0     30.0  EV  0.858  dead     2
+step   7300  mse   63.229  L0     30.0  EV  0.860  dead     2
+step   7400  mse   63.076  L0     30.0  EV  0.859  dead     2
+step   7500  mse   63.227  L0     30.0  EV  0.859  dead     0
+step   7600  mse   64.197  L0     30.0  EV  0.857  dead     0
+step   7700  mse   61.813  L0     30.0  EV  0.862  dead     0
+step   7800  mse   63.955  L0     30.0  EV  0.857  dead     0
+step   7900  mse   63.106  L0     30.0  EV  0.859  dead     0
+step   8000  mse   62.925  L0     30.0  EV  0.859  dead     0
+step   8100  mse   62.719  L0     30.0  EV  0.860  dead     0
+step   8200  mse   62.632  L0     30.0  EV  0.860  dead     0
+step   8300  mse   63.630  L0     30.0  EV  0.859  dead     0
+step   8400  mse   62.365  L0     30.0  EV  0.859  dead     0
+step   8500  mse   61.601  L0     30.0  EV  0.862  dead     1
+step   8600  mse   61.854  L0     30.0  EV  0.861  dead     0
+step   8700  mse   61.603  L0     30.0  EV  0.863  dead     0
+step   8800  mse   61.505  L0     30.0  EV  0.863  dead     0
+step   8900  mse   62.695  L0     30.0  EV  0.859  dead     0
+step   9000  mse   61.812  L0     30.0  EV  0.862  dead     0
+step   9100  mse   62.031  L0     30.0  EV  0.861  dead     1
+step   9200  mse   62.248  L0     30.0  EV  0.861  dead     0
+step   9300  mse   61.445  L0     30.0  EV  0.863  dead     0
+step   9400  mse   61.849  L0     30.0  EV  0.862  dead     0
+step   9500  mse   62.278  L0     30.0  EV  0.860  dead     0
+step   9600  mse   62.015  L0     30.0  EV  0.861  dead     0
+step   9700  mse   62.373  L0     30.0  EV  0.861  dead     0
+step   9800  mse   61.615  L0     30.0  EV  0.862  dead     1
+step   9900  mse   61.836  L0     30.0  EV  0.862  dead     2
+step  10000  mse   62.410  L0     30.0  EV  0.861  dead     2  LR 0.921
+step  10100  mse   62.237  L0     30.0  EV  0.861  dead     2
+step  10200  mse   61.205  L0     30.0  EV  0.862  dead     1
+step  10300  mse   61.219  L0     30.0  EV  0.863  dead     2
+step  10400  mse   60.841  L0     30.0  EV  0.864  dead     2
+step  10500  mse   62.036  L0     30.0  EV  0.862  dead     2
+step  10600  mse   61.549  L0     30.0  EV  0.862  dead     2
+step  10700  mse   61.193  L0     30.0  EV  0.863  dead     2
+step  10800  mse   62.746  L0     30.0  EV  0.860  dead     2
+step  10900  mse   61.282  L0     30.0  EV  0.863  dead     2
+step  11000  mse   62.410  L0     30.0  EV  0.861  dead     0
+step  11100  mse   60.631  L0     30.0  EV  0.865  dead     0
+step  11200  mse   60.965  L0     30.0  EV  0.863  dead     0
+step  11300  mse   61.792  L0     30.0  EV  0.862  dead     0
+step  11400  mse   60.844  L0     30.0  EV  0.865  dead     0
+step  11500  mse   61.803  L0     30.0  EV  0.861  dead     0
+step  11600  mse   61.283  L0     30.0  EV  0.863  dead     1
+step  11700  mse   61.242  L0     30.0  EV  0.863  dead     1
+step  11800  mse   61.794  L0     30.0  EV  0.862  dead     2
+step  11900  mse   62.353  L0     30.0  EV  0.862  dead     2
+step  12000  mse   61.538  L0     30.0  EV  0.864  dead     2
+step  12100  mse   61.237  L0     30.0  EV  0.864  dead     2
+step  12200  mse   61.804  L0     30.0  EV  0.862  dead     4
+step  12300  mse   61.813  L0     30.0  EV  0.862  dead     4
+step  12400  mse   60.738  L0     30.0  EV  0.864  dead     4
+step  12500  mse   61.736  L0     30.0  EV  0.862  dead     5
+step  12600  mse   61.458  L0     30.0  EV  0.863  dead     5
+step  12700  mse   60.257  L0     30.0  EV  0.865  dead     4
+step  12800  mse   60.846  L0     30.0  EV  0.864  dead     4
+step  12900  mse   62.022  L0     30.0  EV  0.861  dead     4
+step  13000  mse   61.805  L0     30.0  EV  0.863  dead     4
+step  13100  mse   62.000  L0     30.0  EV  0.861  dead     4
+step  13200  mse   61.337  L0     30.0  EV  0.863  dead     4
+step  13300  mse   61.750  L0     30.0  EV  0.862  dead     3
+step  13400  mse   61.071  L0     30.0  EV  0.863  dead     3
+step  13500  mse   60.708  L0     30.0  EV  0.863  dead     3
+step  13600  mse   61.891  L0     30.0  EV  0.863  dead     2
+step  13700  mse   61.652  L0     30.0  EV  0.863  dead     2
+step  13800  mse   60.610  L0     30.0  EV  0.864  dead     2
+step  13900  mse   60.988  L0     30.0  EV  0.864  dead     3
+step  14000  mse   61.027  L0     30.0  EV  0.863  dead     3
+step  14100  mse   61.104  L0     30.0  EV  0.863  dead     2
+step  14200  mse   60.810  L0     30.0  EV  0.864  dead     2
+step  14300  mse   61.129  L0     30.0  EV  0.864  dead     2
+step  14400  mse   61.524  L0     30.0  EV  0.864  dead     2
+step  14500  mse   61.268  L0     30.0  EV  0.864  dead     2
+step  14600  mse   60.088  L0     30.0  EV  0.866  dead     2
+step  14700  mse   60.687  L0     30.0  EV  0.865  dead     3
+step  14800  mse   60.680  L0     30.0  EV  0.865  dead     2
+step  14900  mse   60.915  L0     30.0  EV  0.864  dead     2
+step  14999  mse   60.548  L0     30.0  EV  0.865  dead     2  LR 0.918
+
+saved -> C:\Projects\sae-feature-reproducibility\checkpoints\full\arm_b_seed4  (1076s)
+--> arm_b_seed4 done in 18.0 min -> C:\Projects\sae-feature-reproducibility\checkpoints\full\arm_b_seed4
+
+all 10 runs complete in 3.55 h

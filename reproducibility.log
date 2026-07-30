@@ -1,0 +1,53 @@
+loading 10 decoders + alive masks (16384 sample tokens)...
+  arm_a_seed0: 12028/12288 alive
+  arm_a_seed1: 12058/12288 alive
+  arm_a_seed2: 12022/12288 alive
+  arm_a_seed3: 12021/12288 alive
+  arm_a_seed4: 12059/12288 alive
+  arm_b_seed0: 12028/12288 alive
+  arm_b_seed1: 12045/12288 alive
+  arm_b_seed2: 12037/12288 alive
+  arm_b_seed3: 12069/12288 alive
+  arm_b_seed4: 12047/12288 alive
+
+computing within-arm pairwise Hungarian matches...
+saved raw per-feature, per-peer matched similarities -> C:\Projects\sae-feature-reproducibility\results\full\repro_raw_sims
+
+measuring null (5 groups x 4 random dictionaries, reference=arm_a_seed0)...
+
+=== ITEM 1: threshold-free distribution (every feature x peer pair) ===
+Arm A: mean=0.6910  median=0.7416  p10=0.3446  p25=0.5402  p75=0.8763  p90=0.9449  n=240752
+Arm B: mean=0.6900  median=0.7395  p10=0.3447  p25=0.5418  p75=0.8742  p90=0.9422  n=240904
+null:  mean=0.1350  median=0.1340
+KS test (Arm A vs Arm B): statistic=0.0066  p-value=5.078e-05
+  (caveat: samples are not iid -- each feature contributes 4 correlated values, one per peer, and peer decoders are shared across many features' comparisons -- read the p-value as indicative, not a formal test)
+wrote C:\Projects\sae-feature-reproducibility\results\full\repro_distribution_light.png
+wrote C:\Projects\sae-feature-reproducibility\results\full\repro_distribution_dark.png
+
+=== ITEM 2: fraction clearing threshold against ALL 4 peers ===
+ threshold      Arm A      Arm B       null
+      0.17     0.9473     0.9501     0.0000
+      0.22     0.8926     0.8949     0.0000
+      0.27     0.8318     0.8312     0.0000
+      0.32     0.7711     0.7714     0.0000
+      0.37     0.7129     0.7121     0.0000
+      0.42     0.6548     0.6560     0.0000
+      0.47     0.5959     0.5981     0.0000
+      0.52     0.5354     0.5373     0.0000
+      0.57     0.4726     0.4724     0.0000
+      0.62     0.4087     0.4061     0.0000
+      0.67     0.3401     0.3348     0.0000
+      0.72     0.2735     0.2654     0.0000
+      0.77     0.2073     0.1999     0.0000
+      0.82     0.1472     0.1410     0.0000
+      0.87     0.0954     0.0924     0.0000
+      0.92     0.0532     0.0516     0.0000
+wrote C:\Projects\sae-feature-reproducibility\results\full\repro_threshold_curve_light.png
+wrote C:\Projects\sae-feature-reproducibility\results\full\repro_threshold_curve_dark.png
+
+=== ITEM 3: STRICT reproducibility (clears 0.9 against ALL 4 peers) ===
+Arm A: 4141/60188 = 0.0688
+Arm B: 4069/60226 = 0.0676
+wrote per-run strict feature indices (original d_sae indices) -> C:\Projects\sae-feature-reproducibility\results\full\repro_strict_0.9_features.json
+
+wrote C:\Projects\sae-feature-reproducibility\results\full\repro_summary.json
